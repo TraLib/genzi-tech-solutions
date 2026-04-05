@@ -6,51 +6,51 @@
 
 @layer base {
   :root {
-    --background: 240 10% 4%;
+    --background: 0 0% 2%;
     --foreground: 0 0% 95%;
 
-    --card: 240 8% 8%;
+    --card: 0 0% 6%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 240 8% 8%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 262 83% 58%;
+    --primary: 0 85% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 12%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 85%;
 
-    --muted: 240 6% 14%;
-    --muted-foreground: 240 5% 50%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 50%;
 
-    --accent: 192 95% 50%;
+    --accent: 0 85% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 16%;
-    --input: 240 6% 16%;
-    --ring: 262 83% 58%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 85% 45%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(192 95% 50%));
-    --gradient-glow: linear-gradient(135deg, hsl(262 83% 58% / 0.3), hsl(192 95% 50% / 0.3));
-    --shadow-glow: 0 0 60px -12px hsl(262 83% 58% / 0.4);
+    --gradient-primary: linear-gradient(135deg, hsl(0 85% 45%), hsl(0 85% 60%));
+    --gradient-glow: linear-gradient(135deg, hsl(0 85% 45% / 0.3), hsl(0 85% 60% / 0.3));
+    --shadow-glow: 0 0 60px -12px hsl(0 85% 45% / 0.4);
 
     --font-display: 'Space Grotesk', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    --sidebar-background: 240 8% 6%;
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary: 0 85% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 12%;
+    --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 240 6% 16%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-border: 0 0% 14%;
+    --sidebar-ring: 0 85% 45%;
   }
 }
 
@@ -99,8 +99,8 @@
 
   .grid-bg {
     background-image:
-      linear-gradient(hsl(240 6% 16% / 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(240 6% 16% / 0.5) 1px, transparent 1px);
+      linear-gradient(hsl(0 0% 14% / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 14% / 0.5) 1px, transparent 1px);
     background-size: 60px 60px;
   }
 }
