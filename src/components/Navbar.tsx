@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "Services", href: "#services" },
   { label: "About", href: "#about" },
+  { label: "Community", href: "#community" },
   { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },
 ];
@@ -21,9 +23,8 @@ const Navbar = () => {
       transition={{ duration: 0.6, delay: 3.2 }}
     >
       <div className="container mx-auto flex items-center justify-between h-16 px-6">
-        <a href="#home" className="text-xl font-bold tracking-tight">
-          <span className="text-foreground">genzi</span>
-          <span className="text-gradient"> tech</span>
+        <a href="#home" className="flex items-center gap-2">
+          <img src={logo} alt="Genzi Tech" className="h-10 w-auto" />
         </a>
 
         {/* Desktop */}
