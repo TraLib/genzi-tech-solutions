@@ -62,6 +62,11 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-display);
+    cursor: none;
+  }
+
+  a, button, [role="button"] {
+    cursor: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
