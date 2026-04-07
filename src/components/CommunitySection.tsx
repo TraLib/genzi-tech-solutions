@@ -138,24 +138,39 @@ const CommunitySection = () => {
           </a>
         </motion.div>
 
-        {/* Meet the Leader */}
+        {/* Meet the Leaders */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center"
         >
-          <h3 className="text-3xl md:text-4xl font-bold mb-8">
-            Meet the <span className="text-gradient">Leader</span>
+          <h3 className="text-3xl md:text-4xl font-bold mb-12">
+            Meet the <span className="text-gradient">Leaders</span>
           </h3>
-          <div className="max-w-sm mx-auto p-8 rounded-2xl border border-border bg-card/50 backdrop-blur-sm">
-            <div className="w-24 h-24 rounded-full bg-gradient-primary mx-auto mb-5 flex items-center justify-center text-3xl font-bold text-primary-foreground">
-              VR
-            </div>
-            <h4 className="text-xl font-bold text-foreground mb-1">VINUS RAMANI</h4>
-            <p className="text-sm text-muted-foreground font-mono">
-              Founder & CEO (Chief Executive Officer)
-            </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              { initials: "VR", name: "VINUS RAMANI", role: "Founder & CEO (Chief Executive Officer)" },
+              { initials: "KG", name: "KEVINS GOLAKIYA", role: "Co-Founder & VP (Vice President)" },
+              { initials: "SJ", name: "SNEHA JASANI", role: "HR (Human Resources)" },
+            ].map((leader, i) => (
+              <motion.div
+                key={leader.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="p-8 rounded-2xl border border-border bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:shadow-glow transition-all duration-300"
+              >
+                <div className="w-24 h-24 rounded-full bg-gradient-primary mx-auto mb-5 flex items-center justify-center text-3xl font-bold text-primary-foreground">
+                  {leader.initials}
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-1">{leader.name}</h4>
+                <p className="text-sm text-muted-foreground font-mono">
+                  {leader.role}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
