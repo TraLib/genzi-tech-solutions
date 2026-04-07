@@ -1,12 +1,13 @@
 import logo from "@/assets/logo.png";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <footer className="border-t border-border py-10">
       <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <a href="#home" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Genzi Tech" className="h-8 w-auto" />
-        </a>
+        </Link>
         <p className="text-xs text-muted-foreground font-mono">
           © 2026 Genzi Tech Solution Pvt. Ltd. All rights reserved.
         </p>
