@@ -18,7 +18,7 @@ const Navbar = () => {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const location = useLocation();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
