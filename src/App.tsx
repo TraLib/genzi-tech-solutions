@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
+import ServiceDetailPage from "./pages/ServiceDetailPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import CommunityPage from "./pages/CommunityPage.tsx";
 import ProjectsPage from "./pages/ProjectsPage.tsx";
@@ -24,11 +25,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services/:slug" element={<ServiceDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
