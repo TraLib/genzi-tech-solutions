@@ -1,41 +1,10 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Globe, Smartphone, Server, Palette, ShieldCheck, BarChart3 } from "lucide-react";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { allServices } from "@/data/services";
 
-const services = [
-  {
-    icon: Globe,
-    title: "Web Development",
-    description: "Custom web applications built with modern frameworks for optimal performance and scalability.",
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile Apps",
-    description: "Native and cross-platform mobile applications that deliver seamless user experiences.",
-  },
-  {
-    icon: Server,
-    title: "Cloud Solutions",
-    description: "Scalable cloud infrastructure and DevOps services to power your digital operations.",
-  },
-  {
-    icon: Palette,
-    title: "UI/UX Design",
-    description: "Beautiful, intuitive interfaces designed with user-centric methodologies.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Cybersecurity",
-    description: "Comprehensive security audits, penetration testing, and secure architecture design.",
-  },
-  {
-    icon: BarChart3,
-    title: "Digital Marketing",
-    description: "Data-driven strategies for SEO, social media, and performance marketing campaigns.",
-  },
-];
-
-const ServiceCard = ({ service, index }: { service: typeof services[0]; index: number }) => {
+const ServiceCard = ({ service, index }: { service: typeof allServices[0]; index: number }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -45,41 +14,32 @@ const ServiceCard = ({ service, index }: { service: typeof services[0]; index: n
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 0.5, 1]);
   const y = useTransform(scrollYProgress, [0, 0.5, 1], [80, 30, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 0.95, 1]);
-  const rotateX = useTransform(scrollYProgress, [0, 1], [15, 0]);
 
   return (
-    <motion.div
-      ref={ref}
-      style={{ opacity, y, scale, rotateX }}
-      className="group p-8 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:shadow-glow transition-all duration-300"
-    >
-      <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        whileInView={{ scale: 1, rotate: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: index * 0.1, duration: 0.6, type: "spring" }}
-        className="w-12 h-12 rounded-lg bg-gradient-glow flex items-center justify-center mb-5 group-hover:bg-gradient-primary transition-all"
+    <motion.div ref={ref} style={{ opacity, y, scale }}>
+      <Link
+        to={`/services/${service.slug}`}
+        className="group block p-8 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:shadow-glow transition-all duration-300 h-full"
       >
-        <service.icon size={22} className="text-primary group-hover:text-primary-foreground transition-colors" />
-      </motion.div>
-      <motion.h3
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.1 + index * 0.1 }}
-        className="text-lg font-semibold mb-2 text-foreground"
-      >
-        {service.title}
-      </motion.h3>
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.2 + index * 0.1 }}
-        className="text-sm text-muted-foreground leading-relaxed"
-      >
-        {service.description}
-      </motion.p>
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          whileInView={{ scale: 1, rotate: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.05, duration: 0.6, type: "spring" }}
+          className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-all"
+        >
+          <service.icon size={22} className="text-primary" />
+        </motion.div>
+        <h3 className="text-lg font-semibold mb-2 text-foreground group-hover:text-primary transition-colors">
+          {service.title}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          {service.shortDesc}
+        </p>
+        <span className="inline-flex items-center gap-1 text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+          Learn More <ArrowRight size={12} />
+        </span>
+      </Link>
     </motion.div>
   );
 };
@@ -110,9 +70,9 @@ const ServicesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ perspective: "1000px" }}>
-          {services.map((service, i) => (
-            <ServiceCard key={service.title} service={service} index={i} />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allServices.map((service, i) => (
+            <ServiceCard key={service.slug} service={service} index={i} />
           ))}
         </div>
       </div>
