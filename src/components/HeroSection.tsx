@@ -12,37 +12,46 @@ const techLogos = [
   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
 ];
 
-// Hexagon clip path
 const hexClip = "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)";
 
-// Honeycomb hex positions (row, col) for a nice honeycomb grid
-// Row 0: 2 hexes, Row 1: 3 hexes, Row 2: 4 hexes, Row 3: 3 hexes
+// Service images (transparent PNG illustrations)
+const serviceImages: Record<string, string> = {
+  "web-development": "https://cdn-icons-png.flaticon.com/512/1055/1055666.png",
+  "mobile-apps": "https://cdn-icons-png.flaticon.com/512/2920/2920349.png",
+  "cloud-solutions": "https://cdn-icons-png.flaticon.com/512/4215/4215831.png",
+  "ui-ux-design": "https://cdn-icons-png.flaticon.com/512/2620/2620634.png",
+  "cybersecurity": "https://cdn-icons-png.flaticon.com/512/2092/2092663.png",
+  "digital-marketing": "https://cdn-icons-png.flaticon.com/512/1998/1998087.png",
+  "ai-ml-solutions": "https://cdn-icons-png.flaticon.com/512/4529/4529980.png",
+  "database-management": "https://cdn-icons-png.flaticon.com/512/2906/2906274.png",
+  "saas-development": "https://cdn-icons-png.flaticon.com/512/2282/2282188.png",
+  "it-consulting": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+  "devops": "https://cdn-icons-png.flaticon.com/512/10169/10169724.png",
+  "custom-software": "https://cdn-icons-png.flaticon.com/512/1005/1005141.png",
+};
+
+// Honeycomb layout positions
 const hexLayout = [
-  // Row 0 — top
   { row: 0, col: 0.5 },
   { row: 0, col: 1.5 },
-  // Row 1
   { row: 1, col: 0 },
   { row: 1, col: 1 },
   { row: 1, col: 2 },
-  // Row 2 — center (widest)
   { row: 2, col: -0.5 },
   { row: 2, col: 0.5 },
   { row: 2, col: 1.5 },
   { row: 2, col: 2.5 },
-  // Row 3
   { row: 3, col: 0 },
   { row: 3, col: 1 },
   { row: 3, col: 2 },
 ];
 
 const HeroSection = () => {
-  const hexSize = 72; // px width of each hex
-  const hexH = hexSize * 1.1547; // height for regular hex
-  const rowGap = hexH * 0.76;
-  const colGap = hexSize * 1.02;
+  const hexSize = 100;
+  const hexH = hexSize * 1.1547;
+  const rowGap = hexH * 0.77;
+  const colGap = hexSize * 1.04;
 
-  // Center the grid
   const gridWidth = 3.5 * colGap;
   const gridHeight = 3.5 * rowGap;
 
@@ -145,122 +154,107 @@ const HeroSection = () => {
           >
             <div
               className="relative mx-auto"
-              style={{ width: gridWidth + hexSize, height: gridHeight + hexH }}
+              style={{ width: gridWidth + hexSize + 20, height: gridHeight + hexH + 20 }}
             >
-              {/* Connecting lines glow */}
+              {/* Center glow */}
               <motion.div
-                className="absolute inset-0 pointer-events-none"
+                className="absolute pointer-events-none rounded-full"
                 style={{
-                  background: "radial-gradient(ellipse at center, hsl(0 85% 45% / 0.08) 0%, transparent 70%)",
+                  left: "50%", top: "50%", width: 280, height: 280,
+                  transform: "translate(-50%, -50%)",
+                  background: "radial-gradient(circle, hsl(0 85% 50% / 0.12), transparent 70%)",
                 }}
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
 
               {hexLayout.map((pos, i) => {
                 const service = allServices[i % allServices.length];
-                const isOddRow = pos.row % 2 !== 0;
-                const offsetX = isOddRow ? 0 : colGap * 0.0; // already handled in col
-                const x = (pos.col + 0.5) * colGap + offsetX;
+                const x = (pos.col + 0.5) * colGap;
                 const y = pos.row * rowGap;
+                const img = serviceImages[service.slug];
 
                 return (
-                  <motion.div
-                    key={service.slug + "-" + i}
-                    className="absolute group cursor-pointer"
-                    style={{
-                      left: x,
-                      top: y,
-                      width: hexSize,
-                      height: hexH,
-                    }}
-                    initial={{ opacity: 0, scale: 0, rotate: -30 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                    transition={{
-                      delay: 3.8 + i * 0.08,
-                      duration: 0.5,
-                      type: "spring",
-                      stiffness: 200,
-                    }}
-                    whileHover={{ scale: 1.15, zIndex: 20 }}
-                  >
-                    {/* Hex outer glow */}
+                  <Link to={`/services/${service.slug}`} key={service.slug + "-" + i}>
                     <motion.div
-                      className="absolute inset-0"
-                      style={{
-                        clipPath: hexClip,
-                        background: "hsl(0 85% 45% / 0.15)",
-                        filter: "blur(8px)",
+                      className="absolute group cursor-pointer"
+                      style={{ left: x, top: y, width: hexSize, height: hexH }}
+                      initial={{ opacity: 0, scale: 0, rotate: -30 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={{
+                        delay: 3.8 + i * 0.08,
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 200,
                       }}
-                      animate={{ opacity: [0.3, 0.7, 0.3] }}
-                      transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
-                    />
-
-                    {/* Hex border */}
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        clipPath: hexClip,
-                        background: "linear-gradient(135deg, hsl(0 85% 50% / 0.3), hsl(0 85% 35% / 0.15))",
-                      }}
-                    />
-
-                    {/* Hex inner */}
-                    <div
-                      className="absolute inset-[2px] flex flex-col items-center justify-center gap-1 transition-all duration-300"
-                      style={{
-                        clipPath: hexClip,
-                        background: "linear-gradient(160deg, hsl(0 0% 8%), hsl(0 0% 4%))",
-                        boxShadow: "inset 0 0 20px hsl(0 85% 45% / 0.05)",
+                      whileHover={{
+                        scale: 1.2,
+                        zIndex: 20,
+                        transition: { duration: 0.3, type: "spring", stiffness: 300 },
                       }}
                     >
+                      {/* Hex outer glow — pulses */}
                       <motion.div
-                        animate={{ y: [0, -2, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                        className="absolute -inset-2"
+                        style={{
+                          clipPath: hexClip,
+                          background: "hsl(0 85% 45% / 0.12)",
+                          filter: "blur(10px)",
+                        }}
+                        animate={{ opacity: [0.2, 0.6, 0.2] }}
+                        transition={{ duration: 2.5 + i * 0.2, repeat: Infinity, ease: "easeInOut" }}
+                      />
+
+                      {/* Hex border gradient */}
+                      <div
+                        className="absolute inset-0 transition-all duration-300 group-hover:shadow-[0_0_40px_hsl(0_85%_50%/0.4)]"
+                        style={{
+                          clipPath: hexClip,
+                          background: "linear-gradient(135deg, hsl(0 85% 50% / 0.4), hsl(0 85% 35% / 0.15))",
+                        }}
+                      />
+
+                      {/* Hex inner fill */}
+                      <div
+                        className="absolute inset-[2px] flex flex-col items-center justify-center gap-1.5 transition-all duration-300"
+                        style={{
+                          clipPath: hexClip,
+                          background: "linear-gradient(160deg, hsl(0 0% 9%), hsl(0 0% 4%))",
+                        }}
                       >
-                        <service.icon
-                          size={20}
-                          className="text-primary"
-                          style={{ filter: "drop-shadow(0 0 8px hsl(0 85% 50% / 0.6))" }}
+                        {/* Service image */}
+                        <motion.img
+                          src={img}
+                          alt={service.title}
+                          className="w-8 h-8 md:w-10 md:h-10 object-contain"
+                          style={{ filter: "drop-shadow(0 0 8px hsl(0 85% 50% / 0.5))" }}
+                          animate={{ y: [0, -3, 0] }}
+                          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
                         />
-                      </motion.div>
-                      <span className="text-[8px] md:text-[9px] font-mono text-muted-foreground text-center leading-tight px-1 max-w-[60px]">
-                        {service.title}
-                      </span>
-                    </div>
 
-                    {/* Hover tooltip */}
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-md bg-card border border-primary/20 text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 shadow-lg">
-                      {service.shortDesc}
-                    </div>
+                        {/* Service title */}
+                        <span className="text-[8px] md:text-[10px] font-semibold text-foreground/90 text-center leading-tight px-2 max-w-[85px]">
+                          {service.title}
+                        </span>
+                      </div>
 
-                    {/* Neon pulse on hover */}
-                    <motion.div
-                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{
-                        clipPath: hexClip,
-                        boxShadow: "0 0 30px hsl(0 85% 50% / 0.4), inset 0 0 20px hsl(0 85% 50% / 0.1)",
-                        background: "hsl(0 85% 50% / 0.05)",
-                      }}
-                    />
-                  </motion.div>
+                      {/* Hover neon overlay */}
+                      <div
+                        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{
+                          clipPath: hexClip,
+                          background: "linear-gradient(135deg, hsl(0 85% 50% / 0.12), hsl(0 85% 50% / 0.04))",
+                        }}
+                      />
+
+                      {/* Tooltip */}
+                      <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 rounded-md bg-card border border-primary/25 text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 shadow-xl font-mono">
+                        {service.shortDesc}
+                      </div>
+                    </motion.div>
+                  </Link>
                 );
               })}
-
-              {/* Center glow pulse */}
-              <motion.div
-                className="absolute pointer-events-none rounded-full"
-                style={{
-                  left: "50%",
-                  top: "50%",
-                  width: 200,
-                  height: 200,
-                  transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, hsl(0 85% 50% / 0.1), transparent 70%)",
-                }}
-                animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              />
             </div>
           </motion.div>
         </div>
