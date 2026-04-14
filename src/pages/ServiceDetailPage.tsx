@@ -6,6 +6,21 @@ import Footer from "@/components/Footer";
 import CustomCursor from "@/components/CustomCursor";
 import { allServices } from "@/data/services";
 
+const serviceImages: Record<string, string> = {
+  "web-development": "https://cdn-icons-png.flaticon.com/512/1055/1055666.png",
+  "mobile-apps": "https://cdn-icons-png.flaticon.com/512/2920/2920349.png",
+  "cloud-solutions": "https://cdn-icons-png.flaticon.com/512/4215/4215831.png",
+  "ui-ux-design": "https://cdn-icons-png.flaticon.com/512/2620/2620634.png",
+  "cybersecurity": "https://cdn-icons-png.flaticon.com/512/2092/2092663.png",
+  "digital-marketing": "https://cdn-icons-png.flaticon.com/512/1998/1998087.png",
+  "ai-ml-solutions": "https://cdn-icons-png.flaticon.com/512/4529/4529980.png",
+  "database-management": "https://cdn-icons-png.flaticon.com/512/2906/2906274.png",
+  "saas-development": "https://cdn-icons-png.flaticon.com/512/2282/2282188.png",
+  "it-consulting": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+  "devops": "https://cdn-icons-png.flaticon.com/512/10169/10169724.png",
+  "custom-software": "https://cdn-icons-png.flaticon.com/512/1005/1005141.png",
+};
+
 const ServiceDetailPage = () => {
   const { slug } = useParams();
   const service = allServices.find((s) => s.slug === slug);
@@ -51,7 +66,7 @@ const ServiceDetailPage = () => {
             </motion.div>
 
             {/* Header */}
-            <div className="flex flex-col lg:flex-row gap-12 mb-16">
+            <div className="flex flex-col lg:flex-row gap-12 mb-16 items-center">
               <motion.div
                 className="flex-1"
                 initial={{ opacity: 0, x: -30 }}
@@ -73,6 +88,25 @@ const ServiceDetailPage = () => {
                 >
                   Get a Quote <ArrowRight size={16} />
                 </Link>
+              </motion.div>
+
+              {/* Service Image */}
+              <motion.div
+                className="flex-shrink-0"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+              >
+                <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full bg-primary/5 border border-primary/20 animate-pulse" />
+                  <motion.img
+                    src={serviceImages[service.slug]}
+                    alt={service.title}
+                    className="w-32 h-32 md:w-44 md:h-44 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.3)] relative z-10"
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </div>
               </motion.div>
             </div>
 
