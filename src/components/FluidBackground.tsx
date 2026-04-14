@@ -126,7 +126,7 @@ const FluidBackground = () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("click", handleClick);
+      
     };
   }, []);
 
