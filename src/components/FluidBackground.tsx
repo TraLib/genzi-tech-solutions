@@ -55,12 +55,7 @@ const FluidBackground = () => {
       lastY = e.clientY;
     };
 
-    const handleClick = (e: MouseEvent) => {
-      disturb(e.clientX, e.clientY, 1500);
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", handleClick);
 
     const damping = 0.97;
 
