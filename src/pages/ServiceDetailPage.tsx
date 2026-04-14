@@ -66,7 +66,7 @@ const ServiceDetailPage = () => {
             </motion.div>
 
             {/* Header */}
-            <div className="flex flex-col lg:flex-row gap-12 mb-16">
+            <div className="flex flex-col lg:flex-row gap-12 mb-16 items-center">
               <motion.div
                 className="flex-1"
                 initial={{ opacity: 0, x: -30 }}
@@ -88,6 +88,25 @@ const ServiceDetailPage = () => {
                 >
                   Get a Quote <ArrowRight size={16} />
                 </Link>
+              </motion.div>
+
+              {/* Service Image */}
+              <motion.div
+                className="flex-shrink-0"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+              >
+                <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full bg-primary/5 border border-primary/20 animate-pulse" />
+                  <motion.img
+                    src={serviceImages[service.slug]}
+                    alt={service.title}
+                    className="w-32 h-32 md:w-44 md:h-44 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.3)] relative z-10"
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </div>
               </motion.div>
             </div>
 
