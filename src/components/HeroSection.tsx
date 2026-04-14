@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Code2, Zap, Rocket } from "lucide-react";
+import { ArrowRight, Code2, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { allServices } from "@/data/services";
 
@@ -12,9 +12,39 @@ const techLogos = [
   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
 ];
 
+// Hexagon clip path
+const hexClip = "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)";
+
+// Honeycomb hex positions (row, col) for a nice honeycomb grid
+// Row 0: 2 hexes, Row 1: 3 hexes, Row 2: 4 hexes, Row 3: 3 hexes
+const hexLayout = [
+  // Row 0 — top
+  { row: 0, col: 0.5 },
+  { row: 0, col: 1.5 },
+  // Row 1
+  { row: 1, col: 0 },
+  { row: 1, col: 1 },
+  { row: 1, col: 2 },
+  // Row 2 — center (widest)
+  { row: 2, col: -0.5 },
+  { row: 2, col: 0.5 },
+  { row: 2, col: 1.5 },
+  { row: 2, col: 2.5 },
+  // Row 3
+  { row: 3, col: 0 },
+  { row: 3, col: 1 },
+  { row: 3, col: 2 },
+];
+
 const HeroSection = () => {
-  const orbitServices = allServices.slice(0, 8);
-  const outerOrbitServices = allServices.slice(8);
+  const hexSize = 72; // px width of each hex
+  const hexH = hexSize * 1.1547; // height for regular hex
+  const rowGap = hexH * 0.76;
+  const colGap = hexSize * 1.02;
+
+  // Center the grid
+  const gridWidth = 3.5 * colGap;
+  const gridHeight = 3.5 * rowGap;
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -33,7 +63,7 @@ const HeroSection = () => {
       />
 
       {/* Particle dots */}
-      {Array.from({ length: 25 }).map((_, i) => (
+      {Array.from({ length: 20 }).map((_, i) => (
         <motion.div
           key={`p-${i}`}
           className="absolute w-1 h-1 rounded-full bg-primary/40 pointer-events-none"
@@ -106,176 +136,129 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Right visual — Orbiting services circle */}
+          {/* Right visual — Hexagon honeycomb grid */}
           <motion.div
             className="flex-1 relative"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 3.6, duration: 0.8, type: "spring" }}
           >
-            <div className="relative w-[320px] h-[320px] md:w-[420px] md:h-[420px] mx-auto">
-              {/* Outer ring — neon glow */}
+            <div
+              className="relative mx-auto"
+              style={{ width: gridWidth + hexSize, height: gridHeight + hexH }}
+            >
+              {/* Connecting lines glow */}
               <motion.div
-                className="absolute inset-0 rounded-full"
+                className="absolute inset-0 pointer-events-none"
                 style={{
-                  border: "1.5px solid hsl(0 85% 45% / 0.25)",
-                  boxShadow: "0 0 30px hsl(0 85% 45% / 0.1), inset 0 0 30px hsl(0 85% 45% / 0.05)",
+                  background: "radial-gradient(ellipse at center, hsl(0 85% 45% / 0.08) 0%, transparent 70%)",
                 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               />
 
-              {/* Second ring — dashed, neon */}
-              <motion.div
-                className="absolute inset-6 md:inset-8 rounded-full"
-                style={{
-                  border: "1px dashed hsl(0 85% 50% / 0.2)",
-                  boxShadow: "0 0 20px hsl(0 85% 50% / 0.08)",
-                }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-              />
+              {hexLayout.map((pos, i) => {
+                const service = allServices[i % allServices.length];
+                const isOddRow = pos.row % 2 !== 0;
+                const offsetX = isOddRow ? 0 : colGap * 0.0; // already handled in col
+                const x = (pos.col + 0.5) * colGap + offsetX;
+                const y = pos.row * rowGap;
 
-              {/* Inner ring */}
-              <motion.div
-                className="absolute inset-[52px] md:inset-[70px] rounded-full"
-                style={{
-                  border: "1px solid hsl(0 85% 45% / 0.15)",
-                  boxShadow: "0 0 15px hsl(0 85% 45% / 0.06)",
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              />
-
-              {/* Center — Rocket with neon glow */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex items-center justify-center relative"
-                  style={{
-                    background: "linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 5%))",
-                    border: "1px solid hsl(0 85% 45% / 0.3)",
-                    boxShadow: "0 0 40px hsl(0 85% 45% / 0.2), 0 0 80px hsl(0 85% 45% / 0.1), inset 0 0 30px hsl(0 85% 45% / 0.05)",
-                  }}
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  {/* Rocket animation — looping launch */}
+                return (
                   <motion.div
-                    animate={{
-                      y: [0, -8, 0],
-                      scale: [1, 1.1, 1],
+                    key={service.slug + "-" + i}
+                    className="absolute group cursor-pointer"
+                    style={{
+                      left: x,
+                      top: y,
+                      width: hexSize,
+                      height: hexH,
                     }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    initial={{ opacity: 0, scale: 0, rotate: -30 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{
+                      delay: 3.8 + i * 0.08,
+                      duration: 0.5,
+                      type: "spring",
+                      stiffness: 200,
+                    }}
+                    whileHover={{ scale: 1.15, zIndex: 20 }}
                   >
-                    <Rocket size={40} className="text-primary" style={{ filter: "drop-shadow(0 0 12px hsl(0 85% 50% / 0.6))" }} />
-                  </motion.div>
-
-                  {/* Flame trail */}
-                  <motion.div
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 rounded-full"
-                    style={{ background: "linear-gradient(to bottom, hsl(0 85% 50% / 0.6), transparent)" }}
-                    animate={{ height: [8, 20, 8], opacity: [0.4, 0.8, 0.4] }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                </motion.div>
-              </div>
-
-              {/* Inner orbit — 8 services auto-rotating */}
-              <motion.div
-                className="absolute inset-0"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              >
-                {orbitServices.map((service, i) => {
-                  const angle = (i / orbitServices.length) * Math.PI * 2 - Math.PI / 2;
-                  const radius = 130;
-                  const mdRadius = 170;
-                  return (
+                    {/* Hex outer glow */}
                     <motion.div
-                      key={service.slug}
-                      className="absolute group"
+                      className="absolute inset-0"
                       style={{
-                        left: `calc(50% + ${Math.cos(angle) * radius}px - 20px)`,
-                        top: `calc(50% + ${Math.sin(angle) * radius}px - 20px)`,
+                        clipPath: hexClip,
+                        background: "hsl(0 85% 45% / 0.15)",
+                        filter: "blur(8px)",
                       }}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1, rotate: -360 }}
-                      transition={{
-                        opacity: { delay: 3.8 + i * 0.1 },
-                        scale: { delay: 3.8 + i * 0.1, type: "spring" },
-                        rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+                      animate={{ opacity: [0.3, 0.7, 0.3] }}
+                      transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
+                    />
+
+                    {/* Hex border */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        clipPath: hexClip,
+                        background: "linear-gradient(135deg, hsl(0 85% 50% / 0.3), hsl(0 85% 35% / 0.15))",
+                      }}
+                    />
+
+                    {/* Hex inner */}
+                    <div
+                      className="absolute inset-[2px] flex flex-col items-center justify-center gap-1 transition-all duration-300"
+                      style={{
+                        clipPath: hexClip,
+                        background: "linear-gradient(160deg, hsl(0 0% 8%), hsl(0 0% 4%))",
+                        boxShadow: "inset 0 0 20px hsl(0 85% 45% / 0.05)",
                       }}
                     >
-                      {/* Responsive positioning via CSS */}
-                      <div
-                        className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center relative cursor-pointer transition-transform hover:scale-125"
-                        style={{
-                          background: "hsl(0 0% 6%)",
-                          border: "1px solid hsl(0 85% 45% / 0.25)",
-                          boxShadow: "0 0 15px hsl(0 85% 45% / 0.15), 0 0 4px hsl(0 85% 45% / 0.1)",
-                        }}
-                      >
-                        <service.icon size={18} className="text-primary" style={{ filter: "drop-shadow(0 0 6px hsl(0 85% 50% / 0.5))" }} />
-                        {/* Tooltip */}
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded bg-card border border-border text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                          {service.title}
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-
-              {/* Outer orbit — remaining services, slower rotation */}
-              {outerOrbitServices.length > 0 && (
-                <motion.div
-                  className="absolute inset-0"
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-                >
-                  {outerOrbitServices.map((service, i) => {
-                    const angle = (i / outerOrbitServices.length) * Math.PI * 2 - Math.PI / 2;
-                    const radius = 155;
-                    return (
                       <motion.div
-                        key={service.slug}
-                        className="absolute group"
-                        style={{
-                          left: `calc(50% + ${Math.cos(angle) * radius}px - 16px)`,
-                          top: `calc(50% + ${Math.sin(angle) * radius}px - 16px)`,
-                        }}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1, rotate: 360 }}
-                        transition={{
-                          opacity: { delay: 4.2 + i * 0.1 },
-                          scale: { delay: 4.2 + i * 0.1, type: "spring" },
-                          rotate: { duration: 50, repeat: Infinity, ease: "linear" },
-                        }}
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
                       >
-                        <div
-                          className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-125"
-                          style={{
-                            background: "hsl(0 0% 5%)",
-                            border: "1px solid hsl(0 85% 45% / 0.18)",
-                            boxShadow: "0 0 10px hsl(0 85% 45% / 0.1)",
-                          }}
-                        >
-                          <service.icon size={14} className="text-primary/80" style={{ filter: "drop-shadow(0 0 4px hsl(0 85% 50% / 0.4))" }} />
-                          <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-card border border-border text-[9px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                            {service.title}
-                          </div>
-                        </div>
+                        <service.icon
+                          size={20}
+                          className="text-primary"
+                          style={{ filter: "drop-shadow(0 0 8px hsl(0 85% 50% / 0.6))" }}
+                        />
                       </motion.div>
-                    );
-                  })}
-                </motion.div>
-              )}
+                      <span className="text-[8px] md:text-[9px] font-mono text-muted-foreground text-center leading-tight px-1 max-w-[60px]">
+                        {service.title}
+                      </span>
+                    </div>
 
-              {/* Neon pulse ring */}
+                    {/* Hover tooltip */}
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-md bg-card border border-primary/20 text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 shadow-lg">
+                      {service.shortDesc}
+                    </div>
+
+                    {/* Neon pulse on hover */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{
+                        clipPath: hexClip,
+                        boxShadow: "0 0 30px hsl(0 85% 50% / 0.4), inset 0 0 20px hsl(0 85% 50% / 0.1)",
+                        background: "hsl(0 85% 50% / 0.05)",
+                      }}
+                    />
+                  </motion.div>
+                );
+              })}
+
+              {/* Center glow pulse */}
               <motion.div
-                className="absolute inset-0 rounded-full pointer-events-none"
-                style={{ border: "1px solid hsl(0 85% 50% / 0.1)" }}
-                animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.6, 0.3] }}
+                className="absolute pointer-events-none rounded-full"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  width: 200,
+                  height: 200,
+                  transform: "translate(-50%, -50%)",
+                  background: "radial-gradient(circle, hsl(0 85% 50% / 0.1), transparent 70%)",
+                }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
             </div>
