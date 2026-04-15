@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Code2, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { allServices } from "@/data/services";
+import { slugify } from "@/pages/TechDetailPage";
 import { allServices } from "@/data/services";
 
 // Service images (transparent PNG illustrations)
@@ -96,8 +98,8 @@ const techLogos = [
   { name: "VS Code", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" },
 ];
 
-// Build triangle rows: row 1 = 1 logo, row 2 = 3, row 3 = 5, row 4 = 7, row 5 = 9, row 6 = 11, row 7 = 13 = 49 total, then +6 = 55
-const triangleRows = [1, 3, 5, 7, 9, 11, 13, 6];
+// Inverted triangle (▽): widest row first, narrowing down
+const invertedTriangleRows = [13, 11, 9, 7, 5, 3, 1];
 
 const HeroSection = () => {
   const hexSize = 100;
