@@ -380,37 +380,41 @@ const HeroSection = () => {
           ))}
         </motion.div>
 
-        {/* Tech logos — Triangle layout */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.8 }} className="mt-20 overflow-hidden">
+        {/* Tech logos — Inverted Triangle ▽ layout */}
+        <motion.div id="technologies" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.8 }} className="mt-20 overflow-hidden">
           <p className="text-center text-xs text-muted-foreground font-mono mb-8 uppercase tracking-widest">Technologies We Work With</p>
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2 md:gap-3">
             {triangleData.map((row, rowIdx) => (
               <motion.div
                 key={rowIdx}
-                className="flex items-center justify-center gap-3 md:gap-4"
+                className="flex items-center justify-center gap-2 md:gap-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 5 + rowIdx * 0.1 }}
               >
-                {row.logos.map((logo, logoIdx) => (
-                  <motion.div
-                    key={logo.name}
-                    className="group relative w-10 h-10 md:w-12 md:h-12 rounded-lg border border-border/30 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:border-primary/50 transition-all duration-300"
-                    whileHover={{ scale: 1.3, zIndex: 10 }}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 5.1 + rowIdx * 0.08 + logoIdx * 0.03 }}
-                  >
-                    <img
-                      src={logo.url}
-                      alt={logo.name}
-                      className="w-6 h-6 md:w-7 md:h-7 opacity-50 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0"
-                    />
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-card border border-border text-[9px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 font-mono">
-                      {logo.name}
-                    </div>
-                  </motion.div>
-                ))}
+                {row.logos.map((logo, logoIdx) => {
+                  const techSlug = slugify(logo.name);
+                  return (
+                    <Link to={`/tech/${techSlug}`} key={logo.name}>
+                      <motion.div
+                        className="group relative w-10 h-10 md:w-12 md:h-12 rounded-lg border border-border/30 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:border-primary/50 hover:bg-card/80 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300 cursor-pointer"
+                        whileHover={{ scale: 1.6, zIndex: 30 }}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 5.1 + rowIdx * 0.08 + logoIdx * 0.03 }}
+                      >
+                        <img
+                          src={logo.url}
+                          alt={logo.name}
+                          className="w-6 h-6 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110"
+                        />
+                        <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-card border border-primary/30 text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 font-mono shadow-lg">
+                          {logo.name}
+                        </div>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
               </motion.div>
             ))}
           </div>
