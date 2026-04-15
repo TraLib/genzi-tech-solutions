@@ -7,24 +7,28 @@ const projects = [
     category: "Web Application",
     description: "Real-time financial analytics platform with AI-powered insights.",
     color: "from-primary/20 to-accent/20",
+    image: "https://cdn-icons-png.flaticon.com/512/2920/2920277.png",
   },
   {
     title: "MediConnect",
     category: "Mobile App",
     description: "Healthcare appointment and telemedicine platform serving 10k+ users.",
     color: "from-accent/20 to-primary/20",
+    image: "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
   },
   {
     title: "EcoTrack",
     category: "IoT + Cloud",
     description: "Environmental monitoring system with real-time sensor data visualization.",
     color: "from-primary/20 to-accent/10",
+    image: "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
   },
   {
     title: "ShopSphere",
     category: "E-Commerce",
     description: "Multi-vendor marketplace with advanced inventory and payment systems.",
     color: "from-accent/10 to-primary/20",
+    image: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
   },
 ];
 
@@ -57,9 +61,26 @@ const ProjectsSection = () => {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="group relative rounded-xl border border-border bg-card/50 overflow-hidden hover:border-primary/40 transition-all duration-300"
             >
-              {/* Gradient preview area */}
-              <div className={`h-48 bg-gradient-to-br ${project.color} flex items-center justify-center`}>
-                <span className="font-mono text-sm text-muted-foreground/60">{'<'}{project.category}{' />'}</span>
+              {/* Image preview area */}
+              <div className={`h-48 bg-gradient-to-br ${project.color} flex items-center justify-center relative overflow-hidden`}>
+                <motion.img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-24 h-24 object-contain drop-shadow-lg"
+                  style={{ filter: "drop-shadow(0 0 12px hsl(var(--primary) / 0.4))" }}
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                />
+                {/* Floating particles in card */}
+                {[...Array(3)].map((_, j) => (
+                  <motion.div
+                    key={j}
+                    className="absolute w-1.5 h-1.5 rounded-full bg-primary/30"
+                    style={{ left: `${20 + j * 30}%`, top: `${30 + j * 15}%` }}
+                    animate={{ y: [0, -10, 0], opacity: [0.3, 0.8, 0.3] }}
+                    transition={{ duration: 2 + j, repeat: Infinity, delay: j * 0.5 }}
+                  />
+                ))}
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
