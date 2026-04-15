@@ -3,7 +3,6 @@ import { ArrowRight, Code2, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { allServices } from "@/data/services";
 import { slugify } from "@/pages/TechDetailPage";
-import { allServices } from "@/data/services";
 
 // Service images (transparent PNG illustrations)
 const serviceImages: Record<string, string> = {
