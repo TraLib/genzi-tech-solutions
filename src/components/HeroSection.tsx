@@ -112,7 +112,7 @@ const HeroSection = () => {
   // Build triangle layout data
   let techIdx = 0;
   const triangleData: { row: number; logos: typeof techLogos }[] = [];
-  for (const count of triangleRows) {
+  for (const count of invertedTriangleRows) {
     const rowLogos = techLogos.slice(techIdx, techIdx + count);
     triangleData.push({ row: triangleData.length, logos: rowLogos });
     techIdx += count;
