@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage.tsx";
 import CommunityPage from "./pages/CommunityPage.tsx";
 import ProjectsPage from "./pages/ProjectsPage.tsx";
 import ContactPage from "./pages/ContactPage.tsx";
+import TechDetailPage from "./pages/TechDetailPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
