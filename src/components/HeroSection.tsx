@@ -39,7 +39,7 @@ const hexLayout = [
 ];
 
 // 50+ technology logos
-const techLogos = [
+const techLogos: { name: string; url: string; displayName?: string }[] = [
   { name: "React", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
   { name: "Node.js", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
   { name: "Python", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
@@ -55,8 +55,8 @@ const techLogos = [
   { name: "Java", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
   { name: "Go", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original-wordmark.svg" },
   { name: "Rust", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-original.svg" },
-  { name: "C++", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" },
-  { name: "C#", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg" },
+  { name: "CPlusPlus", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg", displayName: "C++" },
+  { name: "CSharp", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg", displayName: "C#" },
   { name: "PHP", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" },
   { name: "Ruby", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg" },
   { name: "Django", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" },
@@ -380,36 +380,81 @@ const HeroSection = () => {
           ))}
         </motion.div>
 
-        {/* Tech logos — Inverted Triangle ▽ layout */}
+        {/* Tech logos — Inverted Triangle ▽ layout with hexagon shapes */}
         <motion.div id="technologies" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.8 }} className="mt-20 overflow-hidden">
           <p className="text-center text-xs text-muted-foreground font-mono mb-8 uppercase tracking-widest">Technologies We Work With</p>
-          <div className="flex flex-col items-center gap-2 md:gap-3">
+          <div className="flex flex-col items-center gap-3 md:gap-4">
             {triangleData.map((row, rowIdx) => (
               <motion.div
                 key={rowIdx}
-                className="flex items-center justify-center gap-2 md:gap-3"
+                className="flex items-center justify-center gap-3 md:gap-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 5 + rowIdx * 0.1 }}
               >
                 {row.logos.map((logo, logoIdx) => {
                   const techSlug = slugify(logo.name);
+                  const hexW = 56;
+                  const hexHt = hexW * 1.1547;
                   return (
                     <Link to={`/tech/${techSlug}`} key={logo.name}>
                       <motion.div
-                        className="group relative w-10 h-10 md:w-12 md:h-12 rounded-lg border border-border/30 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:border-primary/50 hover:bg-card/80 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300 cursor-pointer"
-                        whileHover={{ scale: 1.6, zIndex: 30 }}
+                        className="group relative cursor-pointer"
+                        style={{ width: hexW, height: hexHt }}
+                        whileHover={{ scale: 1.5, zIndex: 30 }}
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 5.1 + rowIdx * 0.08 + logoIdx * 0.03 }}
                       >
-                        <img
-                          src={logo.url}
-                          alt={logo.name}
-                          className="w-6 h-6 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110"
+                        {/* Lightning outer glow */}
+                        <motion.div
+                          className="absolute -inset-2"
+                          style={{ clipPath: hexClip, filter: "blur(4px)" }}
+                          animate={{
+                            background: [
+                              "linear-gradient(0deg, hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.3), hsl(var(--primary) / 0.05))",
+                              "linear-gradient(120deg, hsl(var(--primary) / 0.3), hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.3))",
+                              "linear-gradient(240deg, hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.4), hsl(var(--primary) / 0.05))",
+                              "linear-gradient(360deg, hsl(var(--primary) / 0.3), hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.3))",
+                            ],
+                            opacity: [0.3, 0.8, 0.5, 0.8, 0.3],
+                          }}
+                          transition={{ duration: 2 + (logoIdx % 3) * 0.5, repeat: Infinity, ease: "easeInOut" }}
                         />
-                        <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-card border border-primary/30 text-[10px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 font-mono shadow-lg">
-                          {logo.name}
+                        {/* Lightning border — conic arc */}
+                        <motion.div
+                          className="absolute -inset-[1px]"
+                          style={{ clipPath: hexClip }}
+                          animate={{
+                            background: [
+                              "conic-gradient(from 0deg, hsl(var(--primary) / 0.7), transparent 25%, hsl(var(--primary) / 0.5), transparent 50%, hsl(var(--primary) / 0.8), transparent 75%)",
+                              "conic-gradient(from 120deg, hsl(var(--primary) / 0.8), transparent 25%, hsl(var(--primary) / 0.6), transparent 50%, hsl(var(--primary) / 0.7), transparent 75%)",
+                              "conic-gradient(from 240deg, hsl(var(--primary) / 0.6), transparent 25%, hsl(var(--primary) / 0.8), transparent 50%, hsl(var(--primary) / 0.5), transparent 75%)",
+                              "conic-gradient(from 360deg, hsl(var(--primary) / 0.7), transparent 25%, hsl(var(--primary) / 0.5), transparent 50%, hsl(var(--primary) / 0.8), transparent 75%)",
+                            ],
+                          }}
+                          transition={{ duration: 1.5 + (logoIdx % 4) * 0.3, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Inner fill */}
+                        <div
+                          className="absolute inset-[2px] flex items-center justify-center"
+                          style={{ clipPath: hexClip, background: "linear-gradient(160deg, hsl(0 0% 9%), hsl(0 0% 4%))" }}
+                        >
+                          <img
+                            src={logo.url}
+                            alt={logo.displayName || logo.name}
+                            className="w-7 h-7 md:w-8 md:h-8 object-contain transition-transform duration-300 group-hover:scale-110"
+                            style={{ filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.4))" }}
+                          />
+                        </div>
+                        {/* Hover overlay */}
+                        <div
+                          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{ clipPath: hexClip, background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))" }}
+                        />
+                        {/* Tooltip */}
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-card border border-primary/30 text-[9px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 font-mono shadow-lg">
+                          {logo.displayName || logo.name}
                         </div>
                       </motion.div>
                     </Link>
