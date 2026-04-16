@@ -39,7 +39,7 @@ const hexLayout = [
 ];
 
 // 50+ technology logos
-const techLogos = [
+const techLogos: { name: string; url: string; displayName?: string }[] = [
   { name: "React", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
   { name: "Node.js", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
   { name: "Python", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
@@ -442,7 +442,7 @@ const HeroSection = () => {
                         >
                           <img
                             src={logo.url}
-                            alt={logo.name}
+                            alt={logo.displayName || logo.name}
                             className="w-7 h-7 md:w-8 md:h-8 object-contain transition-transform duration-300 group-hover:scale-110"
                             style={{ filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.4))" }}
                           />
@@ -454,7 +454,7 @@ const HeroSection = () => {
                         />
                         {/* Tooltip */}
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-md bg-card border border-primary/30 text-[9px] text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 font-mono shadow-lg">
-                          {logo.name}
+                          {logo.displayName || logo.name}
                         </div>
                       </motion.div>
                     </Link>
