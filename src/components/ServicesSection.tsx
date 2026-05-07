@@ -1,6 +1,6 @@
 import { Suspense, useRef, useMemo, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, Trophy as DreiTrophy } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Trophy } from "lucide-react";
