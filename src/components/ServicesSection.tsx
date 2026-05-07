@@ -1,5 +1,5 @@
-import { Suspense, useRef, useMemo, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -8,69 +8,74 @@ import { allServices, type ServiceData } from "@/data/services";
 import * as THREE from "three";
 
 // ---------- 3D pieces ----------
+// Step layout: straight staircase going UP and BACK (positive Y, negative Z).
+// Camera climbs along with progress so the active step is always centered in front of the user.
 
-// A single curved staircase step that wraps around a central axis
-const SpiralStep = ({
+const STEP_RISE = 0.55;   // vertical distance per step
+const STEP_DEPTH = 0.85;  // horizontal (Z) distance per step
+const STEP_WIDTH = 2.4;
+const STEP_THICKNESS = 0.12;
+const STEP_TREAD = 0.9;
+
+const stepPosition = (i: number): [number, number, number] => [
+  0,
+  i * STEP_RISE,
+  -i * STEP_DEPTH,
+];
+
+const StraightStep = ({
   index,
-  total,
   active,
   passed,
   label,
 }: {
   index: number;
-  total: number;
   active: boolean;
   passed: boolean;
   label: string;
 }) => {
-  // Spiral parameters
-  const radius = 1.4;
-  const angle = (index / total) * Math.PI * 4; // 2 full turns total
-  const yStep = 0.42;
-  const y = -((total - 1) / 2) * yStep + index * yStep;
-
-  const x = Math.cos(angle) * radius;
-  const z = Math.sin(angle) * radius;
-
-  // Step plank rotated to face outward from center
-  const facing = angle + Math.PI / 2;
-
-  const color = passed ? "#dc2626" : active ? "#ef4444" : "#2a2a2a";
+  const [x, y, z] = stepPosition(index);
+  const color = passed ? "#dc2626" : active ? "#ef4444" : "#1f1f1f";
   const emissive = passed || active ? "#7f1d1d" : "#000000";
-  const emissiveIntensity = active ? 1.2 : passed ? 0.5 : 0;
+  const emissiveIntensity = active ? 1.4 : passed ? 0.4 : 0;
 
   return (
-    <group position={[x, y, z]} rotation={[0, -facing, 0]}>
-      {/* Step plank */}
+    <group position={[x, y, z]}>
+      {/* Tread */}
       <mesh castShadow receiveShadow>
-        <boxGeometry args={[0.95, 0.08, 0.55]} />
+        <boxGeometry args={[STEP_WIDTH, STEP_THICKNESS, STEP_TREAD]} />
         <meshStandardMaterial
           color={color}
           emissive={emissive}
           emissiveIntensity={emissiveIntensity}
-          roughness={0.45}
-          metalness={0.25}
+          roughness={0.5}
+          metalness={0.2}
         />
       </mesh>
-      {/* Step edge glow */}
-      <mesh position={[0, 0.045, 0.27]}>
-        <boxGeometry args={[0.95, 0.02, 0.02]} />
+      {/* Riser (front face) */}
+      <mesh position={[0, -STEP_RISE / 2 + STEP_THICKNESS / 2, STEP_TREAD / 2]}>
+        <boxGeometry args={[STEP_WIDTH, STEP_RISE - STEP_THICKNESS, 0.04]} />
+        <meshStandardMaterial color="#0d0d0d" roughness={0.8} />
+      </mesh>
+      {/* Front glow strip */}
+      <mesh position={[0, STEP_THICKNESS / 2 + 0.005, STEP_TREAD / 2 + 0.001]}>
+        <boxGeometry args={[STEP_WIDTH * 0.95, 0.03, 0.02]} />
         <meshStandardMaterial
-          color="#ff2a2a"
+          color="#ff3030"
           emissive="#ff0000"
-          emissiveIntensity={active ? 2.5 : passed ? 1.2 : 0.2}
+          emissiveIntensity={active ? 3 : passed ? 1.2 : 0.25}
         />
       </mesh>
-      {/* Floating label above the step */}
+      {/* Floating label centered over the step, facing the camera */}
       <Text
-        position={[0, 0.32, 0]}
-        fontSize={0.11}
-        color={active ? "#ffffff" : passed ? "#fca5a5" : "#666666"}
+        position={[0, 0.55, 0]}
+        fontSize={active ? 0.22 : 0.14}
+        color={active ? "#ffffff" : passed ? "#fca5a5" : "#555555"}
         anchorX="center"
         anchorY="middle"
-        maxWidth={0.9}
+        maxWidth={STEP_WIDTH - 0.2}
         textAlign="center"
-        outlineWidth={0.005}
+        outlineWidth={0.008}
         outlineColor="#000000"
       >
         {label.toUpperCase()}
@@ -79,17 +84,16 @@ const SpiralStep = ({
   );
 };
 
-// The trophy / goal at the top of the staircase
-const Goal = ({ y, reached }: { y: number; reached: boolean }) => {
+const Goal = ({ position, reached }: { position: [number, number, number]; reached: boolean }) => {
   const ref = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (ref.current) ref.current.rotation.y += dt * 0.6;
   });
   return (
-    <group ref={ref} position={[0, y, 0]}>
+    <group ref={ref} position={position}>
       {/* Cup */}
       <mesh>
-        <cylinderGeometry args={[0.28, 0.18, 0.42, 24]} />
+        <cylinderGeometry args={[0.32, 0.2, 0.5, 24]} />
         <meshStandardMaterial
           color="#fbbf24"
           metalness={1}
@@ -98,20 +102,17 @@ const Goal = ({ y, reached }: { y: number; reached: boolean }) => {
           emissiveIntensity={reached ? 1.4 : 0}
         />
       </mesh>
-      {/* Stem */}
-      <mesh position={[0, -0.32, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 0.22, 16]} />
+      <mesh position={[0, -0.36, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.24, 16]} />
         <meshStandardMaterial color="#fbbf24" metalness={1} roughness={0.25} />
       </mesh>
-      {/* Base */}
-      <mesh position={[0, -0.46, 0]}>
-        <cylinderGeometry args={[0.22, 0.24, 0.08, 24]} />
+      <mesh position={[0, -0.52, 0]}>
+        <cylinderGeometry args={[0.26, 0.28, 0.1, 24]} />
         <meshStandardMaterial color="#b45309" metalness={0.8} roughness={0.4} />
       </mesh>
-      {/* Halo */}
       {reached && (
         <mesh position={[0, 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.45, 0.55, 48]} />
+          <ringGeometry args={[0.55, 0.7, 48]} />
           <meshBasicMaterial color="#fde047" transparent opacity={0.7} side={THREE.DoubleSide} />
         </mesh>
       )}
@@ -119,82 +120,105 @@ const Goal = ({ y, reached }: { y: number; reached: boolean }) => {
   );
 };
 
-// Climber dot that ascends as user scrolls
-const Climber = ({ progress, total }: { progress: number; total: number }) => {
-  const radius = 1.4;
-  const angle = progress * Math.PI * 4;
-  const yStep = 0.42;
-  const y = -((total - 1) / 2) * yStep + progress * (total - 1) * yStep + 0.2;
-  const x = Math.cos(angle) * radius;
-  const z = Math.sin(angle) * radius;
+// Simple stylized human climber that stands one step below the active step
+const Climber = ({ targetIndex }: { targetIndex: number }) => {
+  const ref = useRef<THREE.Group>(null);
+  const stepRef = useRef(targetIndex);
+
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    // Smoothly interpolate to current target step
+    stepRef.current += (targetIndex - stepRef.current) * Math.min(1, dt * 4);
+    const [x, y, z] = stepPosition(stepRef.current);
+    ref.current.position.set(x, y + STEP_THICKNESS / 2, z - STEP_TREAD * 0.1);
+    // Bobbing
+    const t = performance.now() / 300;
+    ref.current.position.y += Math.sin(t) * 0.02;
+  });
 
   return (
-    <group position={[x, y, z]}>
-      <mesh>
-        <sphereGeometry args={[0.13, 24, 24]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1.5} />
+    <group ref={ref}>
+      {/* Body */}
+      <mesh position={[0, 0.35, 0]} castShadow>
+        <capsuleGeometry args={[0.12, 0.35, 8, 16]} />
+        <meshStandardMaterial color="#ef4444" emissive="#7f1d1d" emissiveIntensity={0.6} roughness={0.4} />
       </mesh>
-      <pointLight color="#ff3030" intensity={2} distance={3} />
+      {/* Head */}
+      <mesh position={[0, 0.78, 0]} castShadow>
+        <sphereGeometry args={[0.13, 20, 20]} />
+        <meshStandardMaterial color="#fde68a" roughness={0.6} />
+      </mesh>
+      {/* Glow under feet */}
+      <pointLight color="#ff3030" intensity={1.4} distance={2.4} position={[0, 0.4, 0]} />
     </group>
   );
 };
 
-// Whole spiral scene
-const SpiralStaircase = ({
-  services,
-  progress,
-  activeIndex,
-}: {
-  services: ServiceData[];
-  progress: number;
-  activeIndex: number;
-}) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const total = services.length;
-  const topY = ((total - 1) / 2) * 0.42 + 0.9;
+// Camera that climbs the stairs alongside the climber, looking forward+up
+const ClimbingCamera = ({ targetIndex }: { targetIndex: number }) => {
+  const { camera } = useThree();
+  const idxRef = useRef(targetIndex);
 
-  // Camera-style group rotation that follows progress so the climber stays facing user
-  useFrame(() => {
-    if (groupRef.current) {
-      const targetRot = -progress * Math.PI * 4;
-      groupRef.current.rotation.y += (targetRot - groupRef.current.rotation.y) * 0.08;
-    }
+  useFrame((_, dt) => {
+    idxRef.current += (targetIndex - idxRef.current) * Math.min(1, dt * 3);
+    const [, y, z] = stepPosition(idxRef.current);
+    // Camera sits a bit behind & above the climber, looking at the step in front
+    const camY = y + 1.4;
+    const camZ = z + 2.6;
+    camera.position.lerp(new THREE.Vector3(0, camY, camZ), 1);
+    const [, ly, lz] = stepPosition(idxRef.current + 0.8);
+    camera.lookAt(0, ly + 0.3, lz);
   });
 
+  return null;
+};
+
+const Staircase = ({
+  services,
+  activeIndex,
+  reached,
+}: {
+  services: ServiceData[];
+  activeIndex: number;
+  reached: boolean;
+}) => {
+  const total = services.length;
+  const goalPos = stepPosition(total - 1);
   return (
     <group>
-      <group ref={groupRef}>
-        {/* Central glowing pillar */}
-        <mesh>
-          <cylinderGeometry args={[0.18, 0.22, ((total - 1) * 0.42) + 1.6, 24]} />
-          <meshStandardMaterial
-            color="#1a1a1a"
-            emissive="#dc2626"
-            emissiveIntensity={0.4}
-            roughness={0.3}
-            metalness={0.7}
-          />
+      {services.map((s, i) => (
+        <StraightStep
+          key={s.slug}
+          index={i}
+          active={i === activeIndex}
+          passed={i < activeIndex}
+          label={s.title}
+        />
+      ))}
+
+      {/* Side rails */}
+      {[-1, 1].map((side) => (
+        <mesh
+          key={side}
+          position={[
+            (STEP_WIDTH / 2 + 0.05) * side,
+            ((total - 1) * STEP_RISE) / 2 + 0.5,
+            (-(total - 1) * STEP_DEPTH) / 2,
+          ]}
+          rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
+        >
+          <boxGeometry args={[0.06, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 0.06]} />
+          <meshStandardMaterial color="#1a1a1a" emissive="#dc2626" emissiveIntensity={0.3} metalness={0.7} roughness={0.3} />
         </mesh>
+      ))}
 
-        {services.map((s, i) => (
-          <SpiralStep
-            key={s.slug}
-            index={i}
-            total={total}
-            active={i === activeIndex}
-            passed={i < activeIndex}
-            label={s.title}
-          />
-        ))}
+      {/* Goal trophy floats above the top step */}
+      <Goal position={[goalPos[0], goalPos[1] + 1.0, goalPos[2]]} reached={reached} />
 
-        <Goal y={topY} reached={progress > 0.95} />
-        <Climber progress={progress} total={total} />
-      </group>
-
-      {/* Ground disc */}
-      <mesh position={[0, -((total - 1) / 2) * 0.42 - 0.6, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <ringGeometry args={[1.0, 2.4, 64]} />
-        <meshStandardMaterial color="#0a0a0a" emissive="#dc2626" emissiveIntensity={0.15} side={THREE.DoubleSide} />
+      {/* Ground */}
+      <mesh position={[0, -0.4, 1]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 8]} />
+        <meshStandardMaterial color="#050505" roughness={1} />
       </mesh>
     </group>
   );
@@ -239,7 +263,7 @@ const ServicesSection = () => {
               Our <span className="text-gradient">Services</span>
             </h2>
             <p className="text-muted-foreground text-sm mt-2 max-w-md mx-auto">
-              Scroll to climb the spiral staircase. Each step unlocks a service — reach the top and claim the goal.
+              Scroll to climb the staircase. Each step brings a new service to the front — reach the top and claim the goal.
             </p>
           </motion.div>
 
@@ -248,12 +272,14 @@ const ServicesSection = () => {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-[60%] h-[60%] rounded-full bg-primary/10 blur-3xl" />
             </div>
-            <Canvas shadows camera={{ position: [0, 0.6, 5.5], fov: 42 }}>
+            <Canvas shadows camera={{ position: [0, 1.4, 3.5], fov: 50 }}>
               <Suspense fallback={null}>
-                <ambientLight intensity={0.45} />
-                <directionalLight position={[4, 6, 4]} intensity={1.0} castShadow />
-                <pointLight position={[-3, 2, -3]} intensity={0.6} color="#ef4444" />
-                <SpiralStaircase services={allServices} progress={progress} activeIndex={activeIndex} />
+                <ambientLight intensity={0.5} />
+                <directionalLight position={[4, 8, 4]} intensity={1.1} castShadow />
+                <pointLight position={[-3, 3, 2]} intensity={0.8} color="#ef4444" />
+                <ClimbingCamera targetIndex={activeIndex} />
+                <Staircase services={allServices} activeIndex={activeIndex} reached={reached} />
+                <Climber targetIndex={activeIndex} />
               </Suspense>
             </Canvas>
           </div>
