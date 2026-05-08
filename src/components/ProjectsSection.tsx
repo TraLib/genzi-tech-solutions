@@ -1,36 +1,7 @@
 import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
-
-const projects = [
-  {
-    title: "FinFlow Dashboard",
-    category: "Web Application",
-    description: "Real-time financial analytics platform with AI-powered insights.",
-    color: "from-primary/20 to-accent/20",
-    image: "https://cdn-icons-png.flaticon.com/512/2920/2920277.png",
-  },
-  {
-    title: "MediConnect",
-    category: "Mobile App",
-    description: "Healthcare appointment and telemedicine platform serving 10k+ users.",
-    color: "from-accent/20 to-primary/20",
-    image: "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
-  },
-  {
-    title: "EcoTrack",
-    category: "IoT + Cloud",
-    description: "Environmental monitoring system with real-time sensor data visualization.",
-    color: "from-primary/20 to-accent/10",
-    image: "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
-  },
-  {
-    title: "ShopSphere",
-    category: "E-Commerce",
-    description: "Multi-vendor marketplace with advanced inventory and payment systems.",
-    color: "from-accent/10 to-primary/20",
-    image: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
-  },
-];
+import { ExternalLink, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { allProjects } from "@/data/projects";
 
 const ProjectsSection = () => {
   return (
@@ -52,7 +23,7 @@ const ProjectsSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {projects.map((project, i) => (
+          {allProjects.map((project, i) => (
             <motion.div
               key={project.title}
               initial={{ opacity: 0, y: 30 }}
@@ -61,6 +32,7 @@ const ProjectsSection = () => {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="group relative rounded-xl border border-border bg-card/50 overflow-hidden hover:border-primary/40 transition-all duration-300"
             >
+              <Link to={`/projects/${project.slug}`} className="block">
               {/* Image preview area */}
               <div className={`h-48 bg-gradient-to-br ${project.color} flex items-center justify-center relative overflow-hidden`}>
                 <motion.img
@@ -85,13 +57,24 @@ const ProjectsSection = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold text-foreground">{project.title}</h3>
-                  <ExternalLink size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <ArrowUpRight size={18} className="text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                 </div>
                 <span className="text-xs font-mono text-accent mb-2 inline-block">{project.category}</span>
                 <p className="text-sm text-muted-foreground">{project.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {project.technologies.slice(0, 3).map((t) => (
+                    <span key={t} className="text-[10px] font-mono px-2 py-1 rounded-full border border-border bg-secondary text-muted-foreground">{t}</span>
+                  ))}
+                </div>
               </div>
+              </Link>
             </motion.div>
           ))}
+        </div>
+        <div className="mt-12 text-center">
+          <Link to="/projects" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-primary/40 text-foreground font-medium hover:bg-primary/10 transition-colors">
+            Explore all projects <ExternalLink size={14} />
+          </Link>
         </div>
       </div>
     </section>

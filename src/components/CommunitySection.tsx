@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Palette, Code2, Server, Smartphone, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { allLeaders } from "@/data/leaders";
 
 const teams = [
   {
@@ -149,26 +151,30 @@ const CommunitySection = () => {
             Meet the <span className="text-gradient">Leaders</span>
           </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              { initials: "VR", name: "VINUS RAMANI", role: "Founder & CEO (Chief Executive Officer)" },
-              { initials: "KG", name: "KEVINS GOLAKIYA", role: "Co-Founder & VP (Vice President)" },
-              { initials: "SJ", name: "SNEHA JASANI", role: "HR (Human Resources)" },
-            ].map((leader, i) => (
+            {allLeaders.map((leader, i) => (
               <motion.div
-                key={leader.name}
+                key={leader.slug}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="p-8 rounded-2xl border border-border bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:shadow-glow transition-all duration-300"
               >
-                <div className="w-24 h-24 rounded-full bg-gradient-primary mx-auto mb-5 flex items-center justify-center text-3xl font-bold text-primary-foreground">
-                  {leader.initials}
-                </div>
-                <h4 className="text-xl font-bold text-foreground mb-1">{leader.name}</h4>
-                <p className="text-sm text-muted-foreground font-mono">
-                  {leader.role}
-                </p>
+                <Link
+                  to={`/leaders/${leader.slug}`}
+                  className="block p-8 rounded-2xl border border-border bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:shadow-glow transition-all duration-300 group"
+                >
+                  <div
+                    className="w-24 h-24 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl font-bold text-primary-foreground group-hover:scale-105 transition-transform"
+                    style={{ background: `linear-gradient(135deg, hsl(${leader.accent}), hsl(0 85% 45%))` }}
+                  >
+                    {leader.initials}
+                  </div>
+                  <h4 className="text-xl font-bold text-foreground mb-1">{leader.name}</h4>
+                  <p className="text-sm text-muted-foreground font-mono mb-3">{leader.title}</p>
+                  <span className="inline-flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    View Portfolio <ArrowRight size={12} />
+                  </span>
+                </Link>
               </motion.div>
             ))}
           </div>
