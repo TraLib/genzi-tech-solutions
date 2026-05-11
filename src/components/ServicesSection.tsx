@@ -244,35 +244,89 @@ const ServicesSection = () => {
       <div className="relative" style={{ height: `${allServices.length * 100 + 100}vh` }}>
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* 3D Canvas */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black">
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-[70%] h-[70%] rounded-full bg-red-600/15 blur-3xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950 to-[#1a0505]">
+            {/* Ambient glows */}
+            <div className="absolute top-1/3 -left-20 w-[40rem] h-[40rem] rounded-full bg-red-600/20 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 -right-20 w-[35rem] h-[35rem] rounded-full bg-red-900/25 blur-[100px] pointer-events-none" />
+            {/* Subtle grid */}
+            <div
+              className="absolute inset-0 opacity-[0.06] pointer-events-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(239,68,68,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,.5) 1px, transparent 1px)",
+                backgroundSize: "60px 60px",
+              }}
+            />
+
+            {/* Heading — top-left, out of the way */}
+            <div className="absolute top-8 left-8 md:top-12 md:left-12 z-20 max-w-xs pointer-events-none">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="h-px w-8 bg-red-500" />
+                <p className="text-[10px] tracking-[0.4em] text-red-500/90 font-semibold">
+                  CLIMB THE STAIRS
+                </p>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black leading-[0.95] tracking-tight">
+                <span className="bg-gradient-to-br from-white via-red-100 to-red-500 bg-clip-text text-transparent">
+                  Our
+                </span>
+                <br />
+                <span className="bg-gradient-to-br from-red-400 via-red-500 to-red-700 bg-clip-text text-transparent">
+                  Services
+                </span>
+              </h2>
+              <p className="text-xs text-zinc-500 mt-3 leading-relaxed">
+                Scroll to ascend · click any step to explore
+              </p>
             </div>
 
-            {/* Progress indicator */}
-            <div className="absolute top-1/2 right-6 -translate-y-1/2 z-20 flex flex-col gap-2 pointer-events-none">
+            {/* Active service info — bottom-left card */}
+            <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 z-20 pointer-events-none">
+              <div
+                key={activeIndex}
+                className="animate-fade-in flex items-center gap-3 px-4 py-3 rounded-xl border border-red-500/30 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(239,68,68,0.2)]"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.6)]">
+                  {(() => {
+                    const Icon = allServices[activeIndex]?.icon;
+                    return Icon ? <Icon size={20} className="text-white" /> : null;
+                  })()}
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-red-400/80">
+                    Step {activeIndex + 1} / {allServices.length}
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {allServices[activeIndex]?.title}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress indicator — right rail */}
+            <div className="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none">
+              <div className="text-[9px] tracking-[0.3em] text-red-500/70 font-bold writing-mode-vertical mb-2">
+                {String(activeIndex + 1).padStart(2, "0")}
+              </div>
               {allServices.map((s, i) => (
                 <div
                   key={s.slug}
-                  className={`w-1.5 rounded-full transition-all duration-500 ${
+                  className={`rounded-full transition-all duration-500 ${
                     i === activeIndex
-                      ? "h-8 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+                      ? "w-2 h-10 bg-gradient-to-b from-red-400 to-red-600 shadow-[0_0_15px_rgba(239,68,68,0.9)]"
                       : i < activeIndex
-                      ? "h-3 bg-red-700"
-                      : "h-3 bg-zinc-700"
+                      ? "w-1.5 h-3 bg-red-700"
+                      : "w-1.5 h-3 bg-zinc-800"
                   }`}
                 />
               ))}
+              <div className="text-[9px] tracking-[0.3em] text-zinc-600 font-bold mt-2">
+                {String(allServices.length).padStart(2, "0")}
+              </div>
             </div>
 
-            {/* Heading overlay */}
-            <div className="absolute top-10 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
-              <p className="text-xs tracking-[0.4em] text-red-500/80 mb-2">CLIMB THE STAIRS</p>
-              <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-white via-red-200 to-red-500 bg-clip-text text-transparent">
-                Our Services
-              </h2>
-              <p className="text-xs text-zinc-500 mt-2">scroll to ascend · click any step</p>
-            </div>
+            {/* Vignette */}
+            <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
 
             <Canvas shadows camera={{ position: [0, 1.6, 4], fov: 50 }} gl={{ antialias: true, alpha: true }}>
               <Suspense fallback={null}>
