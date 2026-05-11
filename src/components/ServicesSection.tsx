@@ -1,21 +1,20 @@
 import { Suspense, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Text } from "@react-three/drei";
+import { Html, Sparkles, Stars } from "@react-three/drei";
 import { useScroll, useMotionValueEvent } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { allServices, type ServiceData } from "@/data/services";
 import * as THREE from "three";
 
 // ---------- 3D pieces ----------
-// Step layout: straight staircase going UP and BACK (positive Y, negative Z).
-// Camera climbs along with progress so the active step is always centered in front of the user.
+// Beautiful glass + glow staircase. Each step is clickable and navigates to its service page.
 
-const STEP_RISE = 0.55;   // vertical distance per step
-const STEP_DEPTH = 0.85;  // horizontal (Z) distance per step
-const STEP_WIDTH = 2.4;
-const STEP_THICKNESS = 0.12;
-const STEP_TREAD = 0.9;
+const STEP_RISE = 0.6;
+const STEP_DEPTH = 0.95;
+const STEP_WIDTH = 3.0;
+const STEP_THICKNESS = 0.14;
+const STEP_TREAD = 1.05;
 
 const stepPosition = (i: number): [number, number, number] => [
   0,
@@ -28,60 +27,122 @@ const StraightStep = ({
   active,
   passed,
   label,
+  slug,
+  onSelect,
 }: {
   index: number;
   active: boolean;
   passed: boolean;
   label: string;
+  slug: string;
+  onSelect: (slug: string) => void;
 }) => {
   const [x, y, z] = stepPosition(index);
-  // First step is always red (label step). Others light up as user climbs.
-  const isFirst = index === 0;
-  const color = isFirst || passed ? "#dc2626" : active ? "#ef4444" : "#1f1f1f";
-  const emissive = isFirst || passed || active ? "#7f1d1d" : "#000000";
-  const emissiveIntensity = isFirst ? 1.6 : active ? 1.4 : passed ? 0.4 : 0;
+  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
+
+  // Subtle floating + scale-on-active animation
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+    const targetScale = active ? 1.08 : 1;
+    const s = groupRef.current.scale.x;
+    const next = s + (targetScale - s) * 0.08;
+    groupRef.current.scale.set(next, next, next);
+    groupRef.current.position.y = y + Math.sin(t * 1.5 + index) * 0.02;
+  });
+
+  const baseColor = active ? "#ef4444" : passed ? "#b91c1c" : "#15161a";
+  const emissive = active ? "#ff2d2d" : passed ? "#7f1d1d" : "#1a0a0a";
+  const emissiveIntensity = active ? 2.2 : passed ? 0.9 : 0.15;
 
   return (
-    <group position={[x, y, z]}>
-      {/* Tread */}
-      <mesh castShadow receiveShadow>
+    <group ref={groupRef} position={[x, y, z]}>
+      {/* Glow halo under step */}
+      <mesh position={[0, -STEP_THICKNESS / 2 - 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[STEP_WIDTH * 0.45, STEP_WIDTH * 0.7, 48]} />
+        <meshBasicMaterial color={active ? "#ff3838" : "#dc2626"} transparent opacity={active ? 0.35 : 0.08} />
+      </mesh>
+
+      {/* Main tread - glassy slab */}
+      <mesh ref={meshRef} castShadow receiveShadow>
         <boxGeometry args={[STEP_WIDTH, STEP_THICKNESS, STEP_TREAD]} />
-        <meshStandardMaterial
-          color={color}
+        <meshPhysicalMaterial
+          color={baseColor}
           emissive={emissive}
           emissiveIntensity={emissiveIntensity}
-          roughness={0.5}
-          metalness={0.2}
+          roughness={0.25}
+          metalness={0.6}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
         />
       </mesh>
-      {/* Riser (front face) */}
-      <mesh position={[0, -STEP_RISE / 2 + STEP_THICKNESS / 2, STEP_TREAD / 2]}>
-        <boxGeometry args={[STEP_WIDTH, STEP_RISE - STEP_THICKNESS, 0.04]} />
-        <meshStandardMaterial color="#0d0d0d" roughness={0.8} />
-      </mesh>
-      {/* Front glow strip */}
-      <mesh position={[0, STEP_THICKNESS / 2 + 0.005, STEP_TREAD / 2 + 0.001]}>
-        <boxGeometry args={[STEP_WIDTH * 0.95, 0.03, 0.02]} />
+
+      {/* Beveled top accent */}
+      <mesh position={[0, STEP_THICKNESS / 2 + 0.005, 0]}>
+        <boxGeometry args={[STEP_WIDTH * 0.96, 0.02, STEP_TREAD * 0.92]} />
         <meshStandardMaterial
-          color="#ff3030"
-          emissive="#ff0000"
-          emissiveIntensity={active ? 3 : passed ? 1.2 : 0.25}
+          color="#ffffff"
+          emissive={active ? "#ff8080" : "#ef4444"}
+          emissiveIntensity={active ? 1.5 : 0.4}
+          metalness={0.9}
+          roughness={0.1}
         />
       </mesh>
-      {/* Floating label centered over the step, facing the camera */}
-      <Text
-        position={[0, 0.55, 0]}
-        fontSize={isFirst ? 0.28 : active ? 0.22 : 0.14}
-        color={isFirst ? "#ffffff" : active ? "#ffffff" : passed ? "#fca5a5" : "#555555"}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={STEP_WIDTH - 0.2}
-        textAlign="center"
-        outlineWidth={0.008}
-        outlineColor="#000000"
-      >
-        {label.toUpperCase()}
-      </Text>
+
+      {/* Riser */}
+      <mesh position={[0, -STEP_RISE / 2 + STEP_THICKNESS / 2, STEP_TREAD / 2]}>
+        <boxGeometry args={[STEP_WIDTH, STEP_RISE - STEP_THICKNESS, 0.05]} />
+        <meshStandardMaterial color="#08090c" roughness={0.85} metalness={0.3} />
+      </mesh>
+
+      {/* Front neon strip */}
+      <mesh position={[0, STEP_THICKNESS / 2 + 0.008, STEP_TREAD / 2 + 0.002]}>
+        <boxGeometry args={[STEP_WIDTH * 0.92, 0.04, 0.025]} />
+        <meshStandardMaterial
+          color="#ff4d4d"
+          emissive="#ff0000"
+          emissiveIntensity={active ? 4 : passed ? 1.6 : 0.3}
+        />
+      </mesh>
+
+      {/* Side caps */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[(STEP_WIDTH / 2) * side, 0, 0]}>
+          <boxGeometry args={[0.04, STEP_THICKNESS + 0.08, STEP_TREAD]} />
+          <meshStandardMaterial
+            color="#ef4444"
+            emissive="#dc2626"
+            emissiveIntensity={active ? 2 : 0.5}
+            metalness={0.9}
+          />
+        </mesh>
+      ))}
+
+      {/* Sparkles around active step */}
+      {active && (
+        <Sparkles count={30} scale={[STEP_WIDTH, 0.8, STEP_TREAD]} size={2.5} speed={0.6} color="#ff4444" />
+      )}
+
+      {/* Clickable HTML label */}
+      <Html position={[0, 0.55, 0]} center distanceFactor={6} zIndexRange={[10, 0]}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(slug);
+          }}
+          className={`pointer-events-auto whitespace-nowrap select-none transition-all duration-300 px-5 py-2 rounded-full border backdrop-blur-md font-bold tracking-wide ${
+            active
+              ? "text-base bg-gradient-to-r from-red-600 to-red-500 text-white border-red-300 shadow-[0_0_30px_rgba(239,68,68,0.8)] scale-110"
+              : passed
+              ? "text-sm bg-red-950/70 text-red-200 border-red-700/60"
+              : "text-xs bg-black/60 text-zinc-400 border-zinc-700/60 hover:text-white hover:border-red-500"
+          }`}
+          style={{ cursor: "pointer" }}
+        >
+          {label.toUpperCase()}
+        </button>
+      </Html>
     </group>
   );
 };
@@ -92,14 +153,15 @@ const ClimbingCamera = ({ targetIndex }: { targetIndex: number }) => {
   const idxRef = useRef(targetIndex);
 
   useFrame((_, dt) => {
-    idxRef.current += (targetIndex - idxRef.current) * Math.min(1, dt * 3);
+    // Smoother interpolation for cinematic feel
+    idxRef.current += (targetIndex - idxRef.current) * Math.min(1, dt * 2);
     const [, y, z] = stepPosition(idxRef.current);
-    // Camera sits a bit behind & above the climber, looking at the step in front
-    const camY = y + 1.4;
-    const camZ = z + 2.6;
-    camera.position.lerp(new THREE.Vector3(0, camY, camZ), 1);
-    const [, ly, lz] = stepPosition(idxRef.current + 0.8);
-    camera.lookAt(0, ly + 0.3, lz);
+    const camY = y + 1.6;
+    const camZ = z + 3.2;
+    const camX = Math.sin(idxRef.current * 0.3) * 0.4;
+    camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 1);
+    const [, ly, lz] = stepPosition(idxRef.current + 0.6);
+    camera.lookAt(0, ly + 0.4, lz);
   });
 
   return null;
@@ -108,9 +170,11 @@ const ClimbingCamera = ({ targetIndex }: { targetIndex: number }) => {
 const Staircase = ({
   services,
   activeIndex,
+  onSelect,
 }: {
   services: ServiceData[];
   activeIndex: number;
+  onSelect: (slug: string) => void;
 }) => {
   const total = services.length;
   return (
@@ -122,6 +186,8 @@ const Staircase = ({
           active={i === activeIndex}
           passed={i < activeIndex}
           label={s.title}
+          slug={s.slug}
+          onSelect={onSelect}
         />
       ))}
 
@@ -130,21 +196,21 @@ const Staircase = ({
         <mesh
           key={side}
           position={[
-            (STEP_WIDTH / 2 + 0.05) * side,
+            (STEP_WIDTH / 2 + 0.12) * side,
             ((total - 1) * STEP_RISE) / 2 + 0.5,
             (-(total - 1) * STEP_DEPTH) / 2,
           ]}
           rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
         >
-          <boxGeometry args={[0.06, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 0.06]} />
-          <meshStandardMaterial color="#1a1a1a" emissive="#dc2626" emissiveIntensity={0.3} metalness={0.7} roughness={0.3} />
+          <cylinderGeometry args={[0.04, 0.04, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
+          <meshStandardMaterial color="#1a1a1a" emissive="#ef4444" emissiveIntensity={0.6} metalness={0.95} roughness={0.2} />
         </mesh>
       ))}
 
-      {/* Ground */}
+      {/* Ground with grid feel */}
       <mesh position={[0, -0.4, 1]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 8]} />
-        <meshStandardMaterial color="#050505" roughness={1} />
+        <planeGeometry args={[40, 80]} />
+        <meshStandardMaterial color="#050505" roughness={1} metalness={0.3} />
       </mesh>
     </group>
   );
@@ -155,6 +221,7 @@ const Staircase = ({
 const ServicesSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -166,23 +233,61 @@ const ServicesSection = () => {
     setActiveIndex(i);
   });
 
+  const handleSelect = (slug: string) => {
+    if (slug === "__title__") return;
+    navigate(`/services/${slug}`);
+  };
+
   return (
     <section id="services" ref={containerRef} className="relative">
       {/* Long scroll container — drives the climb */}
-      <div className="relative" style={{ height: `${allServices.length * 80 + 100}vh` }}>
+      <div className="relative" style={{ height: `${allServices.length * 100 + 100}vh` }}>
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* 3D Canvas */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-[60%] h-[60%] rounded-full bg-primary/10 blur-3xl" />
+              <div className="w-[70%] h-[70%] rounded-full bg-red-600/15 blur-3xl animate-pulse" />
             </div>
-            <Canvas shadows camera={{ position: [0, 1.4, 3.5], fov: 50 }}>
+
+            {/* Progress indicator */}
+            <div className="absolute top-1/2 right-6 -translate-y-1/2 z-20 flex flex-col gap-2 pointer-events-none">
+              {allServices.map((s, i) => (
+                <div
+                  key={s.slug}
+                  className={`w-1.5 rounded-full transition-all duration-500 ${
+                    i === activeIndex
+                      ? "h-8 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+                      : i < activeIndex
+                      ? "h-3 bg-red-700"
+                      : "h-3 bg-zinc-700"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Heading overlay */}
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
+              <p className="text-xs tracking-[0.4em] text-red-500/80 mb-2">CLIMB THE STAIRS</p>
+              <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-white via-red-200 to-red-500 bg-clip-text text-transparent">
+                Our Services
+              </h2>
+              <p className="text-xs text-zinc-500 mt-2">scroll to ascend · click any step</p>
+            </div>
+
+            <Canvas shadows camera={{ position: [0, 1.6, 4], fov: 50 }} gl={{ antialias: true, alpha: true }}>
               <Suspense fallback={null}>
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[4, 8, 4]} intensity={1.1} castShadow />
-                <pointLight position={[-3, 3, 2]} intensity={0.8} color="#ef4444" />
+                <fog attach="fog" args={["#000000", 4, 18]} />
+                <ambientLight intensity={0.35} />
+                <directionalLight position={[4, 8, 4]} intensity={1.2} castShadow />
+                <pointLight position={[-3, 3, 2]} intensity={1.5} color="#ef4444" />
+                <pointLight position={[3, 2, -2]} intensity={1} color="#ff6b6b" />
+                <Stars radius={50} depth={30} count={1500} factor={3} fade speed={0.5} />
                 <ClimbingCamera targetIndex={activeIndex} />
-                <Staircase services={[{ slug: "__title__", title: "Our Services", shortDesc: "", icon: ArrowRight as never } as unknown as ServiceData, ...allServices]} activeIndex={activeIndex + 1} />
+                <Staircase
+                  services={allServices}
+                  activeIndex={activeIndex}
+                  onSelect={handleSelect}
+                />
               </Suspense>
             </Canvas>
           </div>
