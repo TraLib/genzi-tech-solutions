@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { ArrowRight, Code2, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { allServices } from "@/data/services";
@@ -101,7 +102,16 @@ const techLogos: { name: string; url: string; displayName?: string }[] = [
 const invertedTriangleRows = [13, 11, 9, 7, 5, 3, 1];
 
 const HeroSection = () => {
-  const hexSize = 100;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  const hexSize = isMobile ? 64 : 100;
   const hexH = hexSize * 1.1547;
   const rowGap = hexH * 0.77;
   const colGap = hexSize * 1.04;
