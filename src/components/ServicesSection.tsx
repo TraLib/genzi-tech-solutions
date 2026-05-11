@@ -259,14 +259,14 @@ const ServicesSection = () => {
             />
 
             {/* Heading — top-left, out of the way */}
-            <div className="absolute top-8 left-8 md:top-12 md:left-12 z-20 max-w-xs pointer-events-none">
+            <div className="absolute top-20 left-4 md:top-12 md:left-12 z-20 max-w-[55%] md:max-w-xs pointer-events-none">
               <div className="flex items-center gap-2 mb-3">
-                <span className="h-px w-8 bg-red-500" />
-                <p className="text-[10px] tracking-[0.4em] text-red-500/90 font-semibold">
+                <span className="h-px w-6 md:w-8 bg-red-500" />
+                <p className="text-[9px] md:text-[10px] tracking-[0.3em] md:tracking-[0.4em] text-red-500/90 font-semibold">
                   CLIMB THE STAIRS
                 </p>
               </div>
-              <h2 className="text-4xl md:text-6xl font-black leading-[0.95] tracking-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[0.95] tracking-tight">
                 <span className="bg-gradient-to-br from-white via-red-100 to-red-500 bg-clip-text text-transparent">
                   Our
                 </span>
@@ -275,28 +275,28 @@ const ServicesSection = () => {
                   Services
                 </span>
               </h2>
-              <p className="text-xs text-zinc-500 mt-3 leading-relaxed">
+              <p className="text-[10px] md:text-xs text-zinc-500 mt-2 md:mt-3 leading-relaxed">
                 Scroll to ascend · click any step to explore
               </p>
             </div>
 
             {/* Active service info — bottom-left card */}
-            <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 z-20 pointer-events-none">
+            <div className="absolute bottom-6 left-4 right-14 md:right-auto md:bottom-12 md:left-12 z-20 pointer-events-none">
               <div
                 key={activeIndex}
-                className="animate-fade-in flex items-center gap-3 px-4 py-3 rounded-xl border border-red-500/30 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(239,68,68,0.2)]"
+                className="animate-fade-in inline-flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-xl border border-red-500/30 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(239,68,68,0.2)] max-w-full"
               >
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.6)]">
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.6)] flex-shrink-0">
                   {(() => {
                     const Icon = allServices[activeIndex]?.icon;
                     return Icon ? <Icon size={20} className="text-white" /> : null;
                   })()}
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-widest text-red-400/80">
+                <div className="min-w-0">
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-red-400/80">
                     Step {activeIndex + 1} / {allServices.length}
                   </p>
-                  <p className="text-sm font-bold text-white">
+                  <p className="text-xs md:text-sm font-bold text-white truncate">
                     {allServices[activeIndex]?.title}
                   </p>
                 </div>
@@ -304,8 +304,8 @@ const ServicesSection = () => {
             </div>
 
             {/* Progress indicator — right rail */}
-            <div className="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none">
-              <div className="text-[9px] tracking-[0.3em] text-red-500/70 font-bold writing-mode-vertical mb-2">
+            <div className="absolute top-1/2 right-2 md:right-8 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5 md:gap-2 pointer-events-none">
+              <div className="text-[8px] md:text-[9px] tracking-[0.2em] md:tracking-[0.3em] text-red-500/70 font-bold mb-1 md:mb-2">
                 {String(activeIndex + 1).padStart(2, "0")}
               </div>
               {allServices.map((s, i) => (
@@ -313,14 +313,14 @@ const ServicesSection = () => {
                   key={s.slug}
                   className={`rounded-full transition-all duration-500 ${
                     i === activeIndex
-                      ? "w-2 h-10 bg-gradient-to-b from-red-400 to-red-600 shadow-[0_0_15px_rgba(239,68,68,0.9)]"
+                      ? "w-1.5 md:w-2 h-7 md:h-10 bg-gradient-to-b from-red-400 to-red-600 shadow-[0_0_15px_rgba(239,68,68,0.9)]"
                       : i < activeIndex
-                      ? "w-1.5 h-3 bg-red-700"
-                      : "w-1.5 h-3 bg-zinc-800"
+                      ? "w-1 md:w-1.5 h-2 md:h-3 bg-red-700"
+                      : "w-1 md:w-1.5 h-2 md:h-3 bg-zinc-800"
                   }`}
                 />
               ))}
-              <div className="text-[9px] tracking-[0.3em] text-zinc-600 font-bold mt-2">
+              <div className="text-[8px] md:text-[9px] tracking-[0.2em] md:tracking-[0.3em] text-zinc-600 font-bold mt-1 md:mt-2">
                 {String(allServices.length).padStart(2, "0")}
               </div>
             </div>
