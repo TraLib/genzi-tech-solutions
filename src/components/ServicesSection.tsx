@@ -1,9 +1,8 @@
 import { Suspense, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Text, Html, Float, Sparkles, Stars } from "@react-three/drei";
+import { Html, Sparkles, Stars } from "@react-three/drei";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { allServices, type ServiceData } from "@/data/services";
 import * as THREE from "three";
 
