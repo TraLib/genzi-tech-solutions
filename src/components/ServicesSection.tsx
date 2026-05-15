@@ -217,7 +217,7 @@ const StraightStep = ({
 };
 
 // Camera that climbs the stairs alongside the climber, looking forward+up
-const ClimbingCamera = ({ targetIndex }: { targetIndex: number }) => {
+const ClimbingCamera = ({ targetIndex, isMobile }: { targetIndex: number; isMobile: boolean }) => {
   const { camera } = useThree();
   const idxRef = useRef(targetIndex);
 
@@ -225,9 +225,9 @@ const ClimbingCamera = ({ targetIndex }: { targetIndex: number }) => {
     // Smoother interpolation for cinematic feel
     idxRef.current += (targetIndex - idxRef.current) * Math.min(1, dt * 2);
     const [, y, z] = stepPosition(idxRef.current);
-    const camY = y + 1.6;
-    const camZ = z + 3.2;
-    const camX = Math.sin(idxRef.current * 0.3) * 0.4;
+    const camY = y + (isMobile ? 2.0 : 1.6);
+    const camZ = z + (isMobile ? 4.6 : 3.2);
+    const camX = Math.sin(idxRef.current * 0.3) * (isMobile ? 0.2 : 0.4);
     camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 1);
     const [, ly, lz] = stepPosition(idxRef.current + 0.6);
     camera.lookAt(0, ly + 0.4, lz);
@@ -443,7 +443,7 @@ const ServicesSection = () => {
                 <pointLight position={[-3, 3, 2]} intensity={1.5} color="#ef4444" />
                 <pointLight position={[3, 2, -2]} intensity={1} color="#ff6b6b" />
                 <Stars radius={50} depth={30} count={1500} factor={3} fade speed={0.5} />
-                <ClimbingCamera targetIndex={activeIndex} />
+                <ClimbingCamera targetIndex={activeIndex} isMobile={isMobile} />
                 <Staircase
                   services={allServices}
                   activeIndex={activeIndex}
