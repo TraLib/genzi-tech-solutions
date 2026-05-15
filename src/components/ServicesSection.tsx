@@ -366,23 +366,22 @@ const ServicesSection = () => {
             />
 
             {/* Heading — top-left, out of the way */}
-            <div className="absolute top-20 left-4 md:top-12 md:left-12 z-20 max-w-[55%] md:max-w-xs pointer-events-none">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="h-px w-6 md:w-8 bg-red-500" />
-                <p className="text-[9px] md:text-[10px] tracking-[0.3em] md:tracking-[0.4em] text-red-500/90 font-semibold">
+            <div className="absolute top-4 left-3 md:top-12 md:left-12 z-20 max-w-[60%] md:max-w-xs pointer-events-none">
+              <div className="flex items-center gap-2 mb-1 md:mb-3">
+                <span className="h-px w-4 md:w-8 bg-red-500" />
+                <p className="text-[8px] md:text-[10px] tracking-[0.25em] md:tracking-[0.4em] text-red-500/90 font-semibold">
                   CLIMB THE STAIRS
                 </p>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[0.95] tracking-tight">
+              <h2 className="text-xl sm:text-3xl md:text-6xl font-black leading-[0.95] tracking-tight">
                 <span className="bg-gradient-to-br from-white via-red-100 to-red-500 bg-clip-text text-transparent">
                   Our
-                </span>
-                <br />
+                </span>{" "}
                 <span className="bg-gradient-to-br from-red-400 via-red-500 to-red-700 bg-clip-text text-transparent">
                   Services
                 </span>
               </h2>
-              <p className="text-[10px] md:text-xs text-zinc-500 mt-2 md:mt-3 leading-relaxed">
+              <p className="text-[9px] md:text-xs text-zinc-500 mt-1 md:mt-3 leading-relaxed">
                 Scroll to ascend · click any step to explore
               </p>
             </div>
