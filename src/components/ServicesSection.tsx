@@ -270,21 +270,21 @@ const Staircase = ({
               ((total - 1) * STEP_RISE) / 2 + 1.1,
               (-(total - 1) * STEP_DEPTH) / 2,
             ]}
-            rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
+            rotation={[-Math.atan2(STEP_DEPTH, STEP_RISE), 0, 0]}
           >
-            <cylinderGeometry args={[0.05, 0.05, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
+            <cylinderGeometry args={[0.05, 0.05, (total - 1) * Math.hypot(STEP_RISE, STEP_DEPTH) + STEP_TREAD, 16]} />
             <meshStandardMaterial color="#1a1a1a" emissive="#ef4444" emissiveIntensity={0.8} metalness={0.95} roughness={0.2} />
           </mesh>
           {/* Bottom rail */}
           <mesh
             position={[
               (STEP_WIDTH / 2 + 0.18) * side,
-              ((total - 1) * STEP_RISE) / 2 + 0.35,
+              ((total - 1) * STEP_RISE) / 2 + 0.4,
               (-(total - 1) * STEP_DEPTH) / 2,
             ]}
-            rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
+            rotation={[-Math.atan2(STEP_DEPTH, STEP_RISE), 0, 0]}
           >
-            <cylinderGeometry args={[0.03, 0.03, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
+            <cylinderGeometry args={[0.03, 0.03, (total - 1) * Math.hypot(STEP_RISE, STEP_DEPTH) + STEP_TREAD, 16]} />
             <meshStandardMaterial color="#1a1a1a" emissive="#dc2626" emissiveIntensity={0.5} metalness={0.95} roughness={0.2} />
           </mesh>
           {/* Balusters (vertical posts) */}
@@ -293,9 +293,9 @@ const Staircase = ({
             return (
               <mesh
                 key={i}
-                position={[(STEP_WIDTH / 2 + 0.18) * side, y + 0.65, z]}
+                position={[(STEP_WIDTH / 2 + 0.18) * side, y + 0.6, z]}
               >
-                <cylinderGeometry args={[0.018, 0.018, 1.3, 10]} />
+                <cylinderGeometry args={[0.02, 0.02, 1.1, 10]} />
                 <meshStandardMaterial color="#0a0a0a" emissive="#ef4444" emissiveIntensity={0.25} metalness={0.9} roughness={0.3} />
               </mesh>
             );
