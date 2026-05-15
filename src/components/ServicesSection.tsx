@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, Sparkles, Stars } from "@react-three/drei";
 import { useScroll, useMotionValueEvent } from "framer-motion";
@@ -21,6 +21,75 @@ const stepPosition = (i: number): [number, number, number] => [
   i * STEP_RISE,
   -i * STEP_DEPTH,
 ];
+
+// ---------- Decorative Flower ----------
+const FLOWER_COLORS = ["#ff3b6b", "#ffb13b", "#ffd93b", "#7bff8a", "#3bd1ff", "#b08bff", "#ff7bd1"];
+
+const Flower = ({
+  position,
+  color,
+  scale = 1,
+  seed = 0,
+}: {
+  position: [number, number, number];
+  color: string;
+  scale?: number;
+  seed?: number;
+}) => {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    ref.current.rotation.z = Math.sin(t * 0.8 + seed) * 0.15;
+    ref.current.rotation.y = t * 0.3 + seed;
+  });
+  const petals = 6;
+  return (
+    <group ref={ref} position={position} scale={scale}>
+      {/* Center */}
+      <mesh>
+        <sphereGeometry args={[0.06, 12, 12]} />
+        <meshStandardMaterial color="#ffeb3b" emissive="#ffeb3b" emissiveIntensity={1.2} />
+      </mesh>
+      {/* Petals */}
+      {Array.from({ length: petals }).map((_, i) => {
+        const a = (i / petals) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[Math.cos(a) * 0.1, Math.sin(a) * 0.1, 0]}>
+            <sphereGeometry args={[0.07, 10, 10]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.9} roughness={0.4} />
+          </mesh>
+        );
+      })}
+      {/* Glow halo */}
+      <pointLight color={color} intensity={0.4} distance={1.5} />
+    </group>
+  );
+};
+
+// Vine of flowers running along the rail (left or right)
+const FlowerVine = ({ side, total }: { side: -1 | 1; total: number }) => {
+  const count = total * 4; // dense flowers
+  const items = Array.from({ length: count }).map((_, i) => {
+    const t = i / count;
+    const stepIdx = t * (total - 1);
+    const [, y, z] = stepPosition(stepIdx);
+    const wobble = Math.sin(i * 1.7) * 0.18;
+    const x = (STEP_WIDTH / 2 + 0.18) * side + wobble * side * 0.5;
+    const yy = y + 0.55 + Math.sin(i * 0.9) * 0.35;
+    const zz = z + Math.cos(i * 1.3) * 0.25;
+    const color = FLOWER_COLORS[i % FLOWER_COLORS.length];
+    const s = 0.7 + ((i * 13) % 7) / 20;
+    return { pos: [x, yy, zz] as [number, number, number], color, s, seed: i };
+  });
+  return (
+    <group>
+      {items.map((it, i) => (
+        <Flower key={i} position={it.pos} color={it.color} scale={it.s} seed={it.seed} />
+      ))}
+    </group>
+  );
+};
 
 const StraightStep = ({
   index,
@@ -193,18 +262,47 @@ const Staircase = ({
 
       {/* Side rails */}
       {[-1, 1].map((side) => (
-        <mesh
-          key={side}
-          position={[
-            (STEP_WIDTH / 2 + 0.12) * side,
-            ((total - 1) * STEP_RISE) / 2 + 0.5,
-            (-(total - 1) * STEP_DEPTH) / 2,
-          ]}
-          rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
-        >
-          <cylinderGeometry args={[0.04, 0.04, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
-          <meshStandardMaterial color="#1a1a1a" emissive="#ef4444" emissiveIntensity={0.6} metalness={0.95} roughness={0.2} />
-        </mesh>
+        <group key={side}>
+          {/* Top handrail */}
+          <mesh
+            position={[
+              (STEP_WIDTH / 2 + 0.18) * side,
+              ((total - 1) * STEP_RISE) / 2 + 1.1,
+              (-(total - 1) * STEP_DEPTH) / 2,
+            ]}
+            rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
+          >
+            <cylinderGeometry args={[0.05, 0.05, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
+            <meshStandardMaterial color="#1a1a1a" emissive="#ef4444" emissiveIntensity={0.8} metalness={0.95} roughness={0.2} />
+          </mesh>
+          {/* Bottom rail */}
+          <mesh
+            position={[
+              (STEP_WIDTH / 2 + 0.18) * side,
+              ((total - 1) * STEP_RISE) / 2 + 0.35,
+              (-(total - 1) * STEP_DEPTH) / 2,
+            ]}
+            rotation={[Math.atan2(STEP_DEPTH, STEP_RISE) - Math.PI / 2, 0, 0]}
+          >
+            <cylinderGeometry args={[0.03, 0.03, Math.hypot(total * STEP_RISE, total * STEP_DEPTH), 16]} />
+            <meshStandardMaterial color="#1a1a1a" emissive="#dc2626" emissiveIntensity={0.5} metalness={0.95} roughness={0.2} />
+          </mesh>
+          {/* Balusters (vertical posts) */}
+          {Array.from({ length: total }).map((_, i) => {
+            const [, y, z] = stepPosition(i);
+            return (
+              <mesh
+                key={i}
+                position={[(STEP_WIDTH / 2 + 0.18) * side, y + 0.65, z]}
+              >
+                <cylinderGeometry args={[0.018, 0.018, 1.3, 10]} />
+                <meshStandardMaterial color="#0a0a0a" emissive="#ef4444" emissiveIntensity={0.25} metalness={0.9} roughness={0.3} />
+              </mesh>
+            );
+          })}
+          {/* Colorful flower vine wrapping rail */}
+          <FlowerVine side={side as -1 | 1} total={total} />
+        </group>
       ))}
 
       {/* Ground with grid feel */}
@@ -221,7 +319,16 @@ const Staircase = ({
 const ServicesSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(m.matches);
+    update();
+    m.addEventListener("change", update);
+    return () => m.removeEventListener("change", update);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -328,9 +435,9 @@ const ServicesSection = () => {
             {/* Vignette */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
 
-            <Canvas shadows camera={{ position: [0, 1.6, 4], fov: 50 }} gl={{ antialias: true, alpha: true }}>
+            <Canvas shadows camera={{ position: [0, 1.6, 4], fov: isMobile ? 65 : 50 }} gl={{ antialias: true, alpha: true }}>
               <Suspense fallback={null}>
-                <fog attach="fog" args={["#000000", 4, 18]} />
+                <fog attach="fog" args={["#000000", 6, 22]} />
                 <ambientLight intensity={0.35} />
                 <directionalLight position={[4, 8, 4]} intensity={1.2} castShadow />
                 <pointLight position={[-3, 3, 2]} intensity={1.5} color="#ef4444" />
