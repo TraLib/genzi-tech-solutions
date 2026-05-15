@@ -194,18 +194,18 @@ const StraightStep = ({
       )}
 
       {/* Clickable HTML label */}
-      <Html position={[0, 0.55, 0]} center distanceFactor={6} zIndexRange={[10, 0]}>
+      <Html position={[0, 0.55, 0]} center distanceFactor={8} zIndexRange={[10, 0]}>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onSelect(slug);
           }}
-          className={`pointer-events-auto whitespace-nowrap select-none transition-all duration-300 px-5 py-2 rounded-full border backdrop-blur-md font-bold tracking-wide ${
+          className={`pointer-events-auto whitespace-nowrap select-none transition-all duration-300 px-3 py-1.5 sm:px-5 sm:py-2 rounded-full border backdrop-blur-md font-bold tracking-wide ${
             active
-              ? "text-base bg-gradient-to-r from-red-600 to-red-500 text-white border-red-300 shadow-[0_0_30px_rgba(239,68,68,0.8)] scale-110"
+              ? "text-xs sm:text-base bg-gradient-to-r from-red-600 to-red-500 text-white border-red-300 shadow-[0_0_30px_rgba(239,68,68,0.8)] scale-105"
               : passed
-              ? "text-sm bg-red-950/70 text-red-200 border-red-700/60"
-              : "text-xs bg-black/60 text-zinc-400 border-zinc-700/60 hover:text-white hover:border-red-500"
+              ? "text-[10px] sm:text-sm bg-red-950/70 text-red-200 border-red-700/60"
+              : "text-[10px] sm:text-xs bg-black/60 text-zinc-400 border-zinc-700/60 hover:text-white hover:border-red-500"
           }`}
           style={{ cursor: "pointer" }}
         >
